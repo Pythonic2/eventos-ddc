@@ -50,6 +50,11 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         response = self.client.get("/assets/fotoboa1.jpg")
         self.assertEqual(response.status_code, 200)
 
+    def test_prepage_uses_events_clean_environment_image(self):
+        response = self.client.get(reverse("home"))
+        content = b"".join(response.streaming_content).decode()
+        self.assertIn("assets/eventos-ambiente-limpo.png", content)
+
     def test_event_page_returns_200_without_configuration(self):
         EventPage.objects.all().delete()
         response = self.client.get(reverse("eventos:index"))
@@ -140,7 +145,7 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         self.assertContains(response, "Fotos e vídeos administráveis")
         self.assertContains(response, "Card administrável")
 
-    def test_public_page_has_only_four_managed_sections(self):
+    def test_public_page_hides_inactive_promotion_and_legacy_sections(self):
         response = self.client.get(reverse("eventos:index"))
         self.assertContains(response, 'id="empresa"')
         self.assertContains(response, 'id="marcas"')
@@ -149,6 +154,19 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         self.assertNotContains(response, 'id="palavras-chave"')
         self.assertNotContains(response, 'id="galeria"')
         self.assertNotContains(response, 'id="videos"')
+
+    def test_promotion_is_hidden_by_default_and_rendered_when_active(self):
+        page = EventPage.objects.get()
+        promotion = page.secoes.get(tipo=EventSection.SectionType.PROMOTION)
+        self.assertFalse(promotion.ativo)
+        self.assertNotContains(self.client.get(reverse("eventos:index")), 'id="promocao"')
+
+        promotion.ativo = True
+        promotion.save(update_fields=("ativo",))
+
+        response = self.client.get(reverse("eventos:index"))
+        self.assertContains(response, 'id="promocao"')
+        self.assertContains(response, promotion.titulo)
 
     def test_deleted_or_inactive_standard_section_is_not_rendered(self):
         page = EventPage.objects.get()
@@ -330,6 +348,7 @@ class AdminTests(TestCase):
         self.assertContains(response, "Sobre a empresa")
         self.assertContains(response, "Marcas de chopp")
         self.assertContains(response, "Eventos — fotos e vídeos")
+        self.assertContains(response, "Promoção")
         self.assertNotContains(response, "Palavras-chave")
         self.assertNotContains(response, "Galeria de fotos")
         self.assertNotContains(response, ">Vídeos<")

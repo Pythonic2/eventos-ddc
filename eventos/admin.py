@@ -142,6 +142,13 @@ class EventContentInline(EventMediaInline):
     verbose_name_plural = "fotos e vídeos"
 
 
+class PromotionMediaInline(ImageMediaInline):
+    fields = ("imagem", "legenda", "texto_alternativo", "ativo")
+    max_num = 1
+    verbose_name = "imagem da promoção"
+    verbose_name_plural = "imagem da promoção"
+
+
 @admin.register(EventPage)
 class EventPageAdmin(admin.ModelAdmin):
     list_display = ("__str__", "atualizado_em", "hero_preview")
@@ -184,10 +191,10 @@ class EventSectionAdmin(admin.ModelAdmin):
         content_fields = ("chamada", "titulo", "descricao")
         if obj.tipo == EventSection.SectionType.ABOUT:
             content_fields += ("conteudo_extra",)
-        if obj.tipo == EventSection.SectionType.WHATSAPP:
+        if obj.tipo in (EventSection.SectionType.PROMOTION, EventSection.SectionType.WHATSAPP):
             return (
                 ("Texto", {"fields": content_fields}),
-                ("Botão do WhatsApp", {"fields": ("cta_text", "cta_url")}),
+                ("Botão", {"fields": ("cta_text", "cta_url")}),
                 ("Exibição", {"fields": ("ativo",)}),
             )
         return (
@@ -212,6 +219,8 @@ class EventSectionAdmin(admin.ModelAdmin):
             return (BrandMediaInline,)
         if obj and obj.tipo == EventSection.SectionType.EVENTS:
             return (EventContentInline,)
+        if obj and obj.tipo == EventSection.SectionType.PROMOTION:
+            return (PromotionMediaInline,)
         return ()
 
     def has_add_permission(self, request):

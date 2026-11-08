@@ -63,6 +63,7 @@ class EventSection(models.Model):
         ABOUT = "empresa", "Sobre a empresa"
         BRANDS = "marcas", "Marcas de chopp"
         EVENTS = "eventos", "Eventos — fotos e vídeos"
+        PROMOTION = "promocao", "Promoção"
         KEYWORDS = "palavras_chave", "Palavras-chave"
         PRESENTATION = "apresentacao", "Vantagens"
         GALLERY = "galeria", "Galeria de fotos"
@@ -78,6 +79,7 @@ class EventSection(models.Model):
         SectionType.ABOUT,
         SectionType.BRANDS,
         SectionType.EVENTS,
+        SectionType.PROMOTION,
         SectionType.WHATSAPP,
     )
 

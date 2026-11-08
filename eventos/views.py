@@ -21,6 +21,7 @@ def event_page(request):
             "about_section": sections.get(EventSection.SectionType.ABOUT),
             "brands_section": sections.get(EventSection.SectionType.BRANDS),
             "events_section": sections.get(EventSection.SectionType.EVENTS),
+            "promotion_section": sections.get(EventSection.SectionType.PROMOTION),
             "whatsapp_section": sections.get(EventSection.SectionType.WHATSAPP),
         },
     )
