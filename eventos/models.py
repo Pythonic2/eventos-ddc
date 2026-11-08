@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -27,7 +29,7 @@ class EventPage(models.Model):
         upload_to="eventos/hero/",
         blank=True,
         validators=[validate_video_extension, validate_video_size],
-        help_text="Proporção ideal: 16:9, preferencialmente 1920 × 1080 px. Use MP4/WebM de até 100 MB; o vídeo será ajustado sem cortes.",
+        help_text="Use preferencialmente MP4 com vídeo H.264 e áudio AAC. Também são aceitos M4V, WebM, OGG e MOV; o vídeo será exibido sem cortes.",
     )
     hero_cta_text = models.CharField("texto do botão principal", max_length=80, default="Quero chopp no meu evento")
     hero_cta_url = models.CharField("destino do botão principal", max_length=500, default="#whatsapp", validators=[validate_destination])
@@ -130,7 +132,7 @@ class EventMedia(models.Model):
         upload_to=media_upload_path,
         blank=True,
         validators=[validate_video_extension, validate_video_size],
-        help_text="Proporção ideal: 16:9, preferencialmente 1920 × 1080 px. Use MP4/WebM de até 100 MB; a reprodução não cortará o vídeo.",
+        help_text="Use preferencialmente MP4 com vídeo H.264 e áudio AAC. Também são aceitos M4V, WebM, OGG e MOV; a reprodução não cortará o vídeo.",
     )
     video_url = models.CharField("URL do vídeo", max_length=500, blank=True, validators=[validate_destination])
     thumbnail = models.ImageField(
@@ -184,6 +186,18 @@ class EventMedia(models.Model):
     @property
     def video_source(self):
         return self.video_file.url if self.video_file else self.video_url
+
+    @property
+    def video_content_type(self):
+        source = self.video_file.name if self.video_file else self.video_url
+        extension = Path(source.split("?", 1)[0]).suffix.lower()
+        return {
+            ".mp4": "video/mp4",
+            ".m4v": "video/mp4",
+            ".webm": "video/webm",
+            ".ogg": "video/ogg",
+            ".mov": "video/quicktime",
+        }.get(extension, "video/mp4")
 
     @property
     def image_source(self):

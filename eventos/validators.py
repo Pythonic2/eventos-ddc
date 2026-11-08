@@ -1,12 +1,13 @@
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 
 
 IMAGE_EXTENSIONS = ("jpg", "jpeg", "png", "webp", "gif")
-VIDEO_EXTENSIONS = ("mp4", "webm", "ogg")
+VIDEO_EXTENSIONS = ("mp4", "m4v", "webm", "ogg", "mov")
 
 
 def validate_file_size(upload, *, maximum, label):
@@ -19,7 +20,7 @@ def validate_image_size(upload):
 
 
 def validate_video_size(upload):
-    validate_file_size(upload, maximum=100 * 1024 * 1024, label="arquivo de vídeo")
+    validate_file_size(upload, maximum=settings.MEDIA_MAX_UPLOAD_SIZE, label="arquivo de vídeo")
 
 
 validate_image_extension = FileExtensionValidator(allowed_extensions=IMAGE_EXTENSIONS)

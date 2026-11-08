@@ -11,9 +11,11 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from eventos.models import EventMedia, EventPage, EventSection
+from eventos.validators import validate_video_size
 
 
 GIF_BYTES = b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;"
+MP4_BYTES = b"\x00\x00\x00\x18ftypmp42\x00\x00\x00\x00mp42isom"
 
 
 class TemporaryMediaMixin:
@@ -183,6 +185,55 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         response = self.client.get(reverse("eventos:index"))
         self.assertContains(response, "/static/eventos/bomba-dona-do-chopp.png")
 
+    def test_available_video_uses_dynamic_filefield_url(self):
+        page = EventPage.objects.get()
+        events = page.secoes.get(tipo=EventSection.SectionType.EVENTS)
+        video = EventMedia.objects.create(
+            secao=events,
+            media_type=EventMedia.MediaType.VIDEO,
+            titulo="Vídeo enviado pelo Admin",
+            video_file=SimpleUploadedFile("video-admin.mp4", MP4_BYTES, content_type="video/mp4"),
+            ordem=99,
+        )
+
+        response = self.client.get(reverse("eventos:index"))
+        self.assertContains(response, video.video_file.url)
+        self.assertContains(response, 'type="video/mp4"')
+        self.assertContains(response, "playsinline")
+        self.assertNotContains(response, "evento-1.mp4 na pasta assets/videos")
+        self.assertNotContains(response, "method:'HEAD'")
+
+    def test_unavailable_video_has_inline_message_without_play_button(self):
+        page = EventPage.objects.get()
+        events = page.secoes.get(tipo=EventSection.SectionType.EVENTS)
+        EventMedia.objects.create(
+            secao=events,
+            media_type=EventMedia.MediaType.VIDEO,
+            titulo="Vídeo sem arquivo",
+            ordem=100,
+        )
+
+        response = self.client.get(reverse("eventos:index"))
+        self.assertContains(response, "Vídeo ainda não disponível.")
+        self.assertNotContains(response, 'aria-label="Reproduzir Vídeo sem arquivo"')
+
+    def test_video_upload_persists_field_and_storage_object(self):
+        page = EventPage.objects.get()
+        events = page.secoes.get(tipo=EventSection.SectionType.EVENTS)
+        video = EventMedia(
+            secao=events,
+            media_type=EventMedia.MediaType.VIDEO,
+            titulo="Persistência real",
+            video_file=SimpleUploadedFile("persistencia.m4v", MP4_BYTES, content_type="video/mp4"),
+        )
+        video.full_clean()
+        video.save()
+        video.refresh_from_db()
+
+        self.assertTrue(video.video_file.name.endswith(".m4v"))
+        self.assertTrue(video.video_file.storage.exists(video.video_file.name))
+        self.assertEqual(video.video_content_type, "video/mp4")
+
 
 class ModelValidationTests(TemporaryMediaMixin, TestCase):
     def test_only_one_page_configuration_is_allowed(self):
@@ -232,6 +283,12 @@ class ModelValidationTests(TemporaryMediaMixin, TestCase):
             descricao="Resposta",
         )
         item.full_clean()
+
+    @override_settings(MEDIA_MAX_UPLOAD_SIZE=8)
+    def test_video_size_uses_configured_limit(self):
+        upload = SimpleUploadedFile("grande.mp4", b"123456789", content_type="video/mp4")
+        with self.assertRaises(ValidationError):
+            validate_video_size(upload)
 
 
 class AdminTests(TestCase):
@@ -287,7 +344,7 @@ class AdminTests(TestCase):
         self.assertNotContains(response, 'name="seo_title"')
         self.assertNotContains(response, 'name="ativo"')
         self.assertContains(response, "1920 × 1080 px")
-        self.assertContains(response, "o vídeo será ajustado sem cortes")
+        self.assertContains(response, "MP4 com vídeo H.264 e áudio AAC")
 
     def test_events_admin_combines_photo_and_video_fields(self):
         self.client.force_login(self.admin_user)

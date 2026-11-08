@@ -20,11 +20,10 @@ do cliente antes de publicar. A foto da chopeira e da atendente é a
 imagem original fornecida pelo cliente em assets/bomba-dona-do-chopp.png.
 
 3. VÍDEOS
-Coloque arquivos MP4 reais na pasta assets/videos/:
-  evento-1.mp4
-  evento-2.mp4
-Os blocos de vídeo ficam com capa até haver mídia. Sem arquivo,
-o botão avisa que o vídeo ainda não foi incluído.
+Cadastre os vídeos na seção Eventos do Django Admin. Os uploads usam
+o storage configurado pelo projeto e o frontend recebe a URL dinâmica
+do FileField. MP4 com vídeo H.264 e áudio AAC oferece a melhor
+compatibilidade entre computadores e celulares.
 
 4. IMPLANTAÇÃO
 Publique index.html e a pasta assets no mesmo diretório.
