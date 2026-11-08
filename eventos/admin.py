@@ -5,10 +5,18 @@ from django.utils.html import format_html
 from .models import EventMedia, EventPage, EventSection
 
 
+class EventSectionAdminForm(forms.ModelForm):
+    class Meta:
+        model = EventSection
+        fields = "__all__"
+        labels = {"ativo": "Visível na página"}
+
+
 class EventMediaInlineForm(forms.ModelForm):
     class Meta:
         model = EventMedia
         exclude = ("media_type",)
+        labels = {"ativo": "Visível"}
 
     def clean(self):
         cleaned_data = super().clean()
@@ -26,10 +34,29 @@ class TextMediaInlineForm(forms.ModelForm):
     class Meta:
         model = EventMedia
         exclude = ("media_type",)
+        labels = {"ativo": "Visível"}
 
     def clean(self):
         cleaned_data = super().clean()
         self.instance.media_type = EventMedia.MediaType.CONTENT
+        return cleaned_data
+
+
+class BrandMediaInlineForm(forms.ModelForm):
+    class Meta:
+        model = EventMedia
+        exclude = ("media_type",)
+        labels = {
+            "titulo": "Nome da marca",
+            "imagem": "Imagem ou logo",
+            "descricao": "Descrição curta",
+            "ativo": "Visível",
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        has_image = bool(cleaned_data.get("imagem") or self.instance.image_url)
+        self.instance.media_type = EventMedia.MediaType.IMAGE if has_image else EventMedia.MediaType.CONTENT
         return cleaned_data
 
 
@@ -59,11 +86,12 @@ class EventMediaInline(admin.StackedInline):
 
 class ImageMediaInline(EventMediaInline):
     form = EventMediaInlineForm
-    fields = tuple(field for field in MEDIA_INLINE_FIELDS if field != "media_type")
+    fields = ("imagem", "legenda", "texto_alternativo", "ativo")
+    classes = ()
 
 
 class VideoMediaInline(ImageMediaInline):
-    pass
+    fields = ("titulo", "descricao", "video_file", "thumbnail", "ativo")
 
 
 class TextMediaInline(EventMediaInline):
@@ -72,7 +100,10 @@ class TextMediaInline(EventMediaInline):
     classes = ()
 
 
-class BrandMediaInline(TextMediaInline):
+class BrandMediaInline(EventMediaInline):
+    form = BrandMediaInlineForm
+    fields = ("titulo", "imagem", "descricao", "ativo")
+    classes = ()
     verbose_name = "marca"
     verbose_name_plural = "marcas"
 
@@ -107,11 +138,16 @@ class EventPageAdmin(admin.ModelAdmin):
 
 @admin.register(EventSection)
 class EventSectionAdmin(admin.ModelAdmin):
-    list_display = ("titulo", "tipo", "ativo")
+    form = EventSectionAdminForm
+    list_display = ("titulo", "tipo", "is_visible")
     list_filter = ("ativo",)
     search_fields = ("titulo", "descricao")
     ordering = ("ordem", "id")
     inlines = (EventMediaInline,)
+
+    @admin.display(boolean=True, description="Visível")
+    def is_visible(self, obj):
+        return obj.ativo
 
     def get_fieldsets(self, request, obj=None):
         if obj is None:

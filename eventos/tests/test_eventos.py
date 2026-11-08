@@ -156,6 +156,23 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         self.assertNotContains(response, 'href="#empresa"')
         self.assertNotContains(response, 'href="#marcas"')
 
+    def test_uploaded_brand_image_is_rendered(self):
+        page = EventPage.objects.get()
+        brands = page.secoes.get(tipo=EventSection.SectionType.BRANDS)
+        brand = brands.midias.first()
+        brand.titulo = "Marca com imagem cadastrada"
+        brand.media_type = EventMedia.MediaType.IMAGE
+        brand.imagem = SimpleUploadedFile("marca.gif", GIF_BYTES, content_type="image/gif")
+        brand.save()
+
+        response = self.client.get(reverse("eventos:index"))
+        self.assertContains(response, "Marca com imagem cadastrada")
+        self.assertContains(response, brand.image_source)
+
+    def test_brand_without_image_uses_local_example(self):
+        response = self.client.get(reverse("eventos:index"))
+        self.assertContains(response, "/static/eventos/bomba-dona-do-chopp.png")
+
 
 class ModelValidationTests(TemporaryMediaMixin, TestCase):
     def test_only_one_page_configuration_is_allowed(self):
@@ -275,15 +292,17 @@ class AdminTests(TestCase):
         response = self.client.get(reverse("admin:eventos_eventsection_change", args=(occasions.pk,)))
         self.assertEqual(response.status_code, 302)
 
-    def test_brand_admin_only_shows_simple_text_items(self):
+    def test_brand_admin_only_shows_simple_brand_fields(self):
         self.client.force_login(self.admin_user)
         brands = self.page.secoes.get(tipo=EventSection.SectionType.BRANDS)
         response = self.client.get(reverse("admin:eventos_eventsection_change", args=(brands.pk,)))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'name="midias-0-titulo"')
         self.assertContains(response, 'name="midias-0-descricao"')
+        self.assertContains(response, 'name="midias-0-imagem"')
+        self.assertContains(response, "Imagem ou logo")
+        self.assertContains(response, "Visível")
         self.assertNotContains(response, 'name="midias-0-media_type"')
-        self.assertNotContains(response, 'name="midias-0-imagem"')
         self.assertNotContains(response, 'name="midias-0-video_file"')
 
     def test_whatsapp_admin_only_shows_text_and_button(self):
@@ -293,6 +312,7 @@ class AdminTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'name="cta_text"')
         self.assertContains(response, 'name="cta_url"')
+        self.assertContains(response, "Visível na página")
         self.assertNotContains(response, 'name="midias-0-titulo"')
         self.assertNotContains(response, 'name="conteudo_extra"')
 
