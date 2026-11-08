@@ -89,5 +89,5 @@ gcloud run deploy "$SERVICE" \
     --max-instances 1 \
     --concurrency 20 \
     --timeout 120 \
-    --set-env-vars-file "$TEMP_ENV" \
+    --env-vars-file "$TEMP_ENV" \
     --quiet
