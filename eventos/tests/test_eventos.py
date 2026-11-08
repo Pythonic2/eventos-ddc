@@ -262,6 +262,9 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         response = self.client.get(reverse("eventos:index"))
         self.assertContains(response, "Marca com imagem cadastrada")
         self.assertContains(response, brand.image_source)
+        self.assertContains(response, 'class="brand-media-frame"')
+        self.assertContains(response, 'class="brand-media"')
+        self.assertContains(response, "--brand-bg:url(")
 
     def test_brand_without_image_uses_local_example(self):
         response = self.client.get(reverse("eventos:index"))
