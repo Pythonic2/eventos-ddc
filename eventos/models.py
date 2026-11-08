@@ -58,6 +58,9 @@ class EventPage(models.Model):
 
 class EventSection(models.Model):
     class SectionType(models.TextChoices):
+        ABOUT = "empresa", "Sobre a empresa"
+        BRANDS = "marcas", "Marcas de chopp"
+        KEYWORDS = "palavras_chave", "Palavras-chave"
         PRESENTATION = "apresentacao", "Vantagens"
         GALLERY = "galeria", "Galeria de fotos"
         OCCASIONS = "ocasioes", "Tipos de evento"
@@ -66,6 +69,16 @@ class EventSection(models.Model):
         FINAL_CTA = "cta_final", "Chamada final"
         BUDGET = "orcamento", "Orçamento"
         FAQ = "faq", "Dúvidas frequentes"
+        WHATSAPP = "whatsapp", "Contato pelo WhatsApp"
+
+    PUBLIC_TYPES = (
+        SectionType.ABOUT,
+        SectionType.BRANDS,
+        SectionType.KEYWORDS,
+        SectionType.GALLERY,
+        SectionType.VIDEOS,
+        SectionType.WHATSAPP,
+    )
 
     pagina = models.ForeignKey(EventPage, on_delete=models.CASCADE, related_name="secoes", verbose_name="página")
     tipo = models.CharField("tipo de seção", max_length=20, choices=SectionType.choices)

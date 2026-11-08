@@ -59,10 +59,10 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         page.titulo = "Título administrado <script>alert(1)</script>"
         page.descricao = "Descrição do banco"
         page.save()
-        presentation = page.secoes.get(tipo=EventSection.SectionType.PRESENTATION)
-        presentation.titulo = "Apresentação dinâmica"
-        presentation.descricao = "Texto dinâmico"
-        presentation.save()
+        about = page.secoes.get(tipo=EventSection.SectionType.ABOUT)
+        about.titulo = "Apresentação dinâmica"
+        about.descricao = "Texto dinâmico"
+        about.save()
         response = self.client.get(reverse("eventos:index"))
         self.assertContains(response, "Título administrado")
         self.assertContains(response, "Apresentação dinâmica")
@@ -113,7 +113,7 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         self.assertContains(response, 'type="application/ld+json"')
         self.assertContains(response, '"@type":"Service"')
         self.assertContains(response, "batizados")
-        self.assertContains(response, "confraternizações de empresas")
+        self.assertContains(response, "Confraternizações")
         self.assertContains(response, "Fortaleza–CE e Região Metropolitana")
 
     def test_whatsapp_uses_official_number_and_site_source(self):
@@ -121,23 +121,40 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         self.assertContains(response, "5585991803678")
         self.assertContains(response, "Vim pelo site de eventos da Dona do Chopp")
 
-    def test_all_visual_sections_are_seeded_and_editable(self):
+    def test_standard_sections_are_seeded_and_editable(self):
         page = EventPage.objects.get()
-        expected_types = {value for value, _label in EventSection.SectionType.choices}
-        self.assertSetEqual(set(page.secoes.values_list("tipo", flat=True)), expected_types)
+        self.assertTrue(set(EventSection.PUBLIC_TYPES).issubset(set(page.secoes.values_list("tipo", flat=True))))
 
-        occasions = page.secoes.get(tipo=EventSection.SectionType.OCCASIONS)
-        occasions.titulo = "Ocasiões alteradas no Admin"
-        occasions.conteudo_extra = "Texto complementar administrável"
-        occasions.save()
-        first_item = occasions.midias.first()
+        keywords = page.secoes.get(tipo=EventSection.SectionType.KEYWORDS)
+        keywords.titulo = "Palavras-chave alteradas no Admin"
+        keywords.conteudo_extra = "Texto complementar administrável"
+        keywords.save()
+        first_item = keywords.midias.first()
         first_item.titulo = "Card administrável"
         first_item.save()
 
         response = self.client.get(reverse("eventos:index"))
-        self.assertContains(response, "Ocasiões alteradas no Admin")
+        self.assertContains(response, "Palavras-chave alteradas no Admin")
         self.assertContains(response, "Texto complementar administrável")
         self.assertContains(response, "Card administrável")
+
+    def test_deleted_or_inactive_standard_section_is_not_rendered(self):
+        page = EventPage.objects.get()
+        about = page.secoes.get(tipo=EventSection.SectionType.ABOUT)
+        about.titulo = "Empresa que deve desaparecer"
+        about.save()
+        about.delete()
+
+        brands = page.secoes.get(tipo=EventSection.SectionType.BRANDS)
+        brands.titulo = "Marcas que devem desaparecer"
+        brands.ativo = False
+        brands.save()
+
+        response = self.client.get(reverse("eventos:index"))
+        self.assertNotContains(response, "Empresa que deve desaparecer")
+        self.assertNotContains(response, "Marcas que devem desaparecer")
+        self.assertNotContains(response, 'href="#empresa"')
+        self.assertNotContains(response, 'href="#marcas"')
 
 
 class ModelValidationTests(TemporaryMediaMixin, TestCase):
@@ -203,6 +220,18 @@ class AdminTests(TestCase):
         self.client.force_login(self.regular_user)
         response = self.client.get(reverse("admin:eventos_eventpage_change", args=(self.page.pk,)))
         self.assertEqual(response.status_code, 302)
+
+    def test_admin_can_add_and_delete_standard_sections(self):
+        self.client.force_login(self.admin_user)
+        add_response = self.client.get(reverse("admin:eventos_eventsection_add"))
+        self.assertEqual(add_response.status_code, 200)
+        self.assertContains(add_response, "Sobre a empresa")
+        self.assertContains(add_response, "Marcas de chopp")
+        self.assertNotContains(add_response, ">Dúvidas frequentes<")
+
+        about = self.page.secoes.get(tipo=EventSection.SectionType.ABOUT)
+        delete_response = self.client.get(reverse("admin:eventos_eventsection_delete", args=(about.pk,)))
+        self.assertEqual(delete_response.status_code, 200)
 
     def test_admin_hides_technical_page_fields(self):
         self.client.force_login(self.admin_user)

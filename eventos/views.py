@@ -9,7 +9,7 @@ def event_page(request):
     sections = {}
     if page:
         active_media = EventMedia.objects.filter(ativo=True).order_by("ordem", "id")
-        queryset = page.secoes.filter(ativo=True).prefetch_related(
+        queryset = page.secoes.filter(ativo=True, tipo__in=EventSection.PUBLIC_TYPES).prefetch_related(
             models.Prefetch("midias", queryset=active_media)
         )
         sections = {section.tipo: section for section in queryset}
@@ -18,13 +18,11 @@ def event_page(request):
         "eventos/index.html",
         {
             "event_page": page,
-            "presentation_section": sections.get(EventSection.SectionType.PRESENTATION),
+            "about_section": sections.get(EventSection.SectionType.ABOUT),
+            "brands_section": sections.get(EventSection.SectionType.BRANDS),
+            "keywords_section": sections.get(EventSection.SectionType.KEYWORDS),
             "gallery_section": sections.get(EventSection.SectionType.GALLERY),
-            "occasions_section": sections.get(EventSection.SectionType.OCCASIONS),
-            "location_section": sections.get(EventSection.SectionType.LOCATION),
             "videos_section": sections.get(EventSection.SectionType.VIDEOS),
-            "final_cta_section": sections.get(EventSection.SectionType.FINAL_CTA),
-            "budget_section": sections.get(EventSection.SectionType.BUDGET),
-            "faq_section": sections.get(EventSection.SectionType.FAQ),
+            "whatsapp_section": sections.get(EventSection.SectionType.WHATSAPP),
         },
     )

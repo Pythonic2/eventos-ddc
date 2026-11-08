@@ -80,15 +80,27 @@ class EventPageAdmin(admin.ModelAdmin):
 
 @admin.register(EventSection)
 class EventSectionAdmin(admin.ModelAdmin):
-    list_display = ("titulo", "tipo")
+    list_display = ("titulo", "tipo", "ordem", "ativo")
     list_filter = ("tipo",)
     search_fields = ("titulo", "descricao")
     ordering = ("ordem", "id")
     inlines = (EventMediaInline,)
-    fieldsets = (
-        ("Conteúdo da seção", {"fields": ("chamada", "titulo", "subtitulo", "descricao", "conteudo_extra")}),
-        ("Botão opcional", {"fields": ("cta_text", "cta_url"), "classes": ("collapse",)}),
-    )
+
+    def get_fieldsets(self, request, obj=None):
+        structure_fields = ("pagina", "tipo") if obj is None else ()
+        return (
+            ("Tipo de seção", {"fields": structure_fields + ("ordem", "ativo")}),
+            ("Conteúdo da seção", {"fields": ("chamada", "titulo", "subtitulo", "descricao", "conteudo_extra")}),
+            ("Botão opcional", {"fields": ("cta_text", "cta_url"), "classes": ("collapse",)}),
+        )
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        if db_field.name == "tipo":
+            kwargs["choices"] = [
+                choice for choice in EventSection.SectionType.choices
+                if choice[0] in EventSection.PUBLIC_TYPES
+            ]
+        return super().formfield_for_choice_field(db_field, request, **kwargs)
 
     def get_inlines(self, request, obj):
         if obj and obj.tipo == EventSection.SectionType.GALLERY:
@@ -96,13 +108,6 @@ class EventSectionAdmin(admin.ModelAdmin):
         if obj and obj.tipo == EventSection.SectionType.VIDEOS:
             return (VideoMediaInline,)
         return (EventMediaInline,) if obj else ()
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
 
 admin.site.site_header = "Dona do Chopp — Administração"
 admin.site.site_title = "Dona do Chopp"
