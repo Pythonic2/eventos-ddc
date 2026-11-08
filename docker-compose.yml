@@ -1,8 +1,10 @@
+
 services:
   eventos-ddc:
     build:
       context: .
       dockerfile: Dockerfile
+
     container_name: eventos-ddc
     restart: unless-stopped
 
@@ -13,16 +15,31 @@ services:
       DJANGO_ENV: production
       DEBUG: "false"
       PORT: "8080"
-      GCS_APP_PREFIX: eventos-ddc
-      DJANGO_ALLOWED_HOSTS: "127.0.0.1,localhost,192.168.0.6"
+
+      # Django
+      DJANGO_ALLOWED_HOSTS: "127.0.0.1,localhost,192.168.0.6,donadochopp.com.br"
       DJANGO_SECURE_SSL_REDIRECT: "false"
       RUN_MIGRATIONS: "false"
+
+      # Google Cloud Storage
+      GCS_ENABLED: "true"
+      GCS_APP_PREFIX: eventos-ddc
+      GCP_PROJECT_ID: gestcloud-500200
+      GCP_SECRET_NAME: eventos-ddc-credentials
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/gcp.json
+
+    volumes:
+      - /home/pi/gcp-secrets/eventos-ddc.json:/run/secrets/gcp.json:ro
 
     ports:
       - "8011:8080"
 
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz/', timeout=5)"]
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz/', timeout=5)"
       interval: 30s
       timeout: 8s
       retries: 3
