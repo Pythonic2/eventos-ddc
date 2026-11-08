@@ -6,7 +6,7 @@ services:
     container_name: eventos-ddc
     restart: unless-stopped
     env_file:
-      - .env
+      - stack.env
     environment:
       DJANGO_ENV: production
       DEBUG: "false"
