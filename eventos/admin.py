@@ -81,6 +81,16 @@ class EventContentInlineForm(forms.ModelForm):
         )
 
 
+class PromotionContentInlineForm(EventContentInlineForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["media_type"].choices = (
+            (EventMedia.MediaType.CONTENT, "Texto"),
+            (EventMedia.MediaType.IMAGE, "Foto"),
+            (EventMedia.MediaType.VIDEO, "Vídeo"),
+        )
+
+
 MEDIA_INLINE_FIELDS = (
     "media_type",
     "titulo",
@@ -142,11 +152,12 @@ class EventContentInline(EventMediaInline):
     verbose_name_plural = "fotos e vídeos"
 
 
-class PromotionMediaInline(ImageMediaInline):
-    fields = ("imagem", "legenda", "texto_alternativo", "ativo")
-    max_num = 1
-    verbose_name = "imagem da promoção"
-    verbose_name_plural = "imagem da promoção"
+class PromotionContentInline(EventMediaInline):
+    form = PromotionContentInlineForm
+    fields = ("media_type", "titulo", "descricao", "imagem", "video_file", "thumbnail", "legenda", "texto_alternativo", "ordem", "ativo")
+    classes = ()
+    verbose_name = "conteúdo da promoção"
+    verbose_name_plural = "conteúdos da promoção"
 
 
 @admin.register(EventPage)
@@ -191,7 +202,13 @@ class EventSectionAdmin(admin.ModelAdmin):
         content_fields = ("chamada", "titulo", "descricao")
         if obj.tipo == EventSection.SectionType.ABOUT:
             content_fields += ("conteudo_extra",)
-        if obj.tipo in (EventSection.SectionType.PROMOTION, EventSection.SectionType.WHATSAPP):
+        if obj.tipo == EventSection.SectionType.PROMOTION:
+            return (
+                ("Promoção", {"fields": ("chamada", "titulo", "valor", "subtitulo", "descricao", "conteudo_extra")}),
+                ("Botão", {"fields": ("cta_text", "cta_url")}),
+                ("Exibição", {"fields": ("ordem", "ativo")}),
+            )
+        if obj.tipo == EventSection.SectionType.WHATSAPP:
             return (
                 ("Texto", {"fields": content_fields}),
                 ("Botão", {"fields": ("cta_text", "cta_url")}),
@@ -210,7 +227,8 @@ class EventSectionAdmin(admin.ModelAdmin):
             existing_types = set(EventSection.objects.filter(tipo__in=EventSection.PUBLIC_TYPES).values_list("tipo", flat=True))
             kwargs["choices"] = [
                 choice for choice in EventSection.SectionType.choices
-                if choice[0] in EventSection.PUBLIC_TYPES and choice[0] not in existing_types
+                if choice[0] in EventSection.PUBLIC_TYPES
+                and (choice[0] == EventSection.SectionType.PROMOTION or choice[0] not in existing_types)
             ]
         return super().formfield_for_choice_field(db_field, request, **kwargs)
 
@@ -220,12 +238,11 @@ class EventSectionAdmin(admin.ModelAdmin):
         if obj and obj.tipo == EventSection.SectionType.EVENTS:
             return (EventContentInline,)
         if obj and obj.tipo == EventSection.SectionType.PROMOTION:
-            return (PromotionMediaInline,)
+            return (PromotionContentInline,)
         return ()
 
     def has_add_permission(self, request):
-        existing_types = set(EventSection.objects.filter(tipo__in=EventSection.PUBLIC_TYPES).values_list("tipo", flat=True))
-        return bool(EventPage.objects.exists() and set(EventSection.PUBLIC_TYPES) - existing_types) and super().has_add_permission(request)
+        return bool(EventPage.objects.exists()) and super().has_add_permission(request)
 
     def save_model(self, request, obj, form, change):
         if not obj.pagina_id:

@@ -87,6 +87,12 @@ class EventSection(models.Model):
     tipo = models.CharField("tipo de seção", max_length=20, choices=SectionType.choices)
     chamada = models.CharField("chamada superior", max_length=120, blank=True, help_text="Texto pequeno exibido acima do título da seção.")
     titulo = models.CharField("título", max_length=180)
+    valor = models.CharField(
+        "valor",
+        max_length=80,
+        blank=True,
+        help_text="Texto exibido na promoção, por exemplo: R$ 199,90 ou Consulte.",
+    )
     subtitulo = models.CharField("subtítulo", max_length=240, blank=True)
     descricao = models.TextField("texto principal", blank=True)
     conteudo_extra = models.TextField("texto complementar", blank=True)
@@ -99,7 +105,13 @@ class EventSection(models.Model):
         verbose_name = "seção da página"
         verbose_name_plural = "seções da página"
         ordering = ("ordem", "id")
-        constraints = [models.UniqueConstraint(fields=("pagina", "tipo"), name="unique_event_section_type")]
+        constraints = [
+            models.UniqueConstraint(
+                fields=("pagina", "tipo"),
+                condition=~models.Q(tipo="promocao"),
+                name="unique_structural_event_section_type",
+            )
+        ]
 
     def __str__(self):
         return f"{self.get_tipo_display()}: {self.titulo}"

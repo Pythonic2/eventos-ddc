@@ -159,14 +159,66 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         page = EventPage.objects.get()
         promotion = page.secoes.get(tipo=EventSection.SectionType.PROMOTION)
         self.assertFalse(promotion.ativo)
-        self.assertNotContains(self.client.get(reverse("eventos:index")), 'id="promocao"')
+        self.assertNotContains(self.client.get(reverse("eventos:index")), 'id="promocao-')
 
         promotion.ativo = True
-        promotion.save(update_fields=("ativo",))
+        promotion.valor = "R$ 199,90"
+        promotion.descricao = "Descrição da promoção ativa"
+        promotion.save(update_fields=("ativo", "valor", "descricao"))
 
         response = self.client.get(reverse("eventos:index"))
-        self.assertContains(response, 'id="promocao"')
+        self.assertContains(response, f'id="promocao-{promotion.pk}"')
         self.assertContains(response, promotion.titulo)
+        self.assertContains(response, "R$ 199,90")
+        self.assertContains(response, "Descrição da promoção ativa")
+
+    def test_multiple_promotions_render_with_text_photo_and_video(self):
+        page = EventPage.objects.get()
+        first = page.secoes.get(tipo=EventSection.SectionType.PROMOTION)
+        first.titulo = "Primeira promoção"
+        first.ativo = True
+        first.ordem = 4
+        first.save()
+        second = EventSection.objects.create(
+            pagina=page,
+            tipo=EventSection.SectionType.PROMOTION,
+            chamada="SEGUNDA OFERTA",
+            titulo="Segunda promoção",
+            valor="Consulte",
+            descricao="Condição especial",
+            ordem=5,
+            ativo=True,
+        )
+        text = EventMedia.objects.create(
+            secao=second,
+            media_type=EventMedia.MediaType.CONTENT,
+            titulo="Texto promocional",
+            descricao="Detalhes da oferta",
+            ordem=1,
+        )
+        photo = EventMedia.objects.create(
+            secao=second,
+            media_type=EventMedia.MediaType.IMAGE,
+            titulo="Foto promocional",
+            imagem=SimpleUploadedFile("promocao.gif", GIF_BYTES, content_type="image/gif"),
+            ordem=2,
+        )
+        video = EventMedia.objects.create(
+            secao=second,
+            media_type=EventMedia.MediaType.VIDEO,
+            titulo="Vídeo promocional",
+            video_file=SimpleUploadedFile("promocao.mp4", MP4_BYTES, content_type="video/mp4"),
+            ordem=3,
+        )
+
+        content = self.client.get(reverse("eventos:index")).content.decode()
+
+        self.assertLess(content.index(first.titulo), content.index(second.titulo))
+        self.assertLess(content.index(text.titulo), content.index(photo.titulo))
+        self.assertLess(content.index(photo.titulo), content.index(video.titulo))
+        self.assertIn(photo.image_source, content)
+        self.assertIn(video.video_source, content)
+        self.assertIn('type="video/mp4"', content)
 
     def test_deleted_or_inactive_standard_section_is_not_rendered(self):
         page = EventPage.objects.get()
@@ -265,6 +317,24 @@ class ModelValidationTests(TemporaryMediaMixin, TestCase):
             page.full_clean()
         self.assertIn("hero_cta_url", context.exception.message_dict)
 
+    def test_promotions_can_repeat_but_structural_sections_remain_unique(self):
+        page = EventPage.objects.get()
+        EventSection.objects.create(
+            pagina=page,
+            tipo=EventSection.SectionType.PROMOTION,
+            titulo="Outra promoção",
+            ativo=False,
+        )
+        self.assertEqual(page.secoes.filter(tipo=EventSection.SectionType.PROMOTION).count(), 2)
+
+        duplicate_about = EventSection(
+            pagina=page,
+            tipo=EventSection.SectionType.ABOUT,
+            titulo="Outra empresa",
+        )
+        with self.assertRaises(ValidationError):
+            duplicate_about.full_clean()
+
     def test_image_requires_an_image_file(self):
         page = EventPage.objects.get()
         section = page.secoes.get(tipo=EventSection.SectionType.GALLERY)
@@ -338,6 +408,7 @@ class AdminTests(TestCase):
         add_response = self.client.get(reverse("admin:eventos_eventsection_add"))
         self.assertEqual(add_response.status_code, 200)
         self.assertContains(add_response, "Sobre a empresa")
+        self.assertContains(add_response, ">Promoção<")
         self.assertNotContains(add_response, ">Marcas de chopp<")
         self.assertNotContains(add_response, ">Dúvidas frequentes<")
 
@@ -376,6 +447,21 @@ class AdminTests(TestCase):
         self.assertContains(response, 'name="midias-0-thumbnail"')
         self.assertNotContains(response, 'name="tipo"')
         self.assertNotContains(response, 'name="pagina"')
+
+    def test_promotion_admin_has_value_and_rich_content_fields(self):
+        self.client.force_login(self.admin_user)
+        promotion = self.page.secoes.get(tipo=EventSection.SectionType.PROMOTION)
+        response = self.client.get(reverse("admin:eventos_eventsection_change", args=(promotion.pk,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="valor"')
+        self.assertContains(response, 'name="ordem"')
+        self.assertContains(response, 'name="midias-0-media_type"')
+        self.assertContains(response, 'name="midias-0-imagem"')
+        self.assertContains(response, 'name="midias-0-video_file"')
+        self.assertContains(response, ">Texto<")
+        self.assertContains(response, ">Foto<")
+        self.assertContains(response, ">Vídeo<")
 
     def test_legacy_section_is_not_available_in_simplified_admin(self):
         self.client.force_login(self.admin_user)
