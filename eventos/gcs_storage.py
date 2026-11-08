@@ -20,7 +20,7 @@ class CachedGoogleCloudStorage(GoogleCloudStorage):
         cached_url = cache.get(key)
         if cached_url:
             return cached_url
-        signed_url = super().url(normalized, parameters=json.loads(serialized))
+        signed_url = super().url(name, parameters=json.loads(serialized))
         cache.set(key, signed_url, timeout=settings.GCS_SIGNED_URL_CACHE_TTL)
         return signed_url
 

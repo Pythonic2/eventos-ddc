@@ -29,9 +29,9 @@ if not SECRET_KEY:
 
 DEBUG = env_bool("DEBUG", not IS_PRODUCTION) and not IS_PRODUCTION
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", (".run.app",) if IS_PRODUCTION else ("localhost", "127.0.0.1", "testserver"))
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ALLOWED_HOSTS)
+ALLOWED_HOSTS = list(dict.fromkeys([*ALLOWED_HOSTS, *env_list("DJANGO_ALLOWED_HOSTS")]))
 CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS", ("https://*.run.app",) if IS_PRODUCTION else ())
-CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", CSRF_TRUSTED_ORIGINS)
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys([*CSRF_TRUSTED_ORIGINS, *env_list("DJANGO_CSRF_TRUSTED_ORIGINS")]))
 
 INSTALLED_APPS = [
     "django.contrib.admin", "django.contrib.auth", "django.contrib.contenttypes",

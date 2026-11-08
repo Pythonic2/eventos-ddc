@@ -12,6 +12,7 @@ services:
       DEBUG: "false"
       PORT: "8080"
       GCS_APP_PREFIX: eventos-ddc
+      DJANGO_ALLOWED_HOSTS: "127.0.0.1,localhost"
       RUN_MIGRATIONS: "false"
     ports:
       - "8011:8080"
