@@ -35,6 +35,15 @@ def read_env(path):
 
 
 source = read_env(sys.argv[1])
+
+
+def append_csv(value, required):
+    items = [item.strip() for item in value.split(",") if item.strip()]
+    if required not in items:
+        items.append(required)
+    return ",".join(items)
+
+
 allowed = {
     "SECRET_KEY", "DB_ENGINE", "DB_NAME", "DB_USER", "DB_PASSWORD", "DB_HOST", "DB_PORT",
     "DB_SCHEMA", "DB_SSLMODE", "DB_CHANNEL_BINDING", "DB_CONNECT_TIMEOUT", "DB_CONN_MAX_AGE",
@@ -48,8 +57,8 @@ env.update({
     "GCS_APP_PREFIX": "eventos-ddc", "SERVE_MEDIA": "false", "RUN_MIGRATIONS": "false",
     "DJANGO_SECURE_SSL_REDIRECT": "true",
 })
-env.setdefault("ALLOWED_HOSTS", ".run.app")
-env.setdefault("CSRF_TRUSTED_ORIGINS", "https://*.run.app")
+env["ALLOWED_HOSTS"] = append_csv(env.get("ALLOWED_HOSTS", ""), ".run.app")
+env["CSRF_TRUSTED_ORIGINS"] = append_csv(env.get("CSRF_TRUSTED_ORIGINS", ""), "https://*.run.app")
 required = ("SECRET_KEY", "DB_NAME", "DB_USER", "DB_PASSWORD", "DB_HOST", "DB_SCHEMA", "GCS_BUCKET_NAME", "GCS_PROJECT_ID", "GCS_SA_EMAIL")
 missing = [key for key in required if not env.get(key)]
 if missing:
