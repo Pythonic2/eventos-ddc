@@ -223,15 +223,30 @@ class AdminTests(TestCase):
 
     def test_admin_can_add_and_delete_standard_sections(self):
         self.client.force_login(self.admin_user)
-        add_response = self.client.get(reverse("admin:eventos_eventsection_add"))
-        self.assertEqual(add_response.status_code, 200)
-        self.assertContains(add_response, "Sobre a empresa")
-        self.assertContains(add_response, "Marcas de chopp")
-        self.assertNotContains(add_response, ">Dúvidas frequentes<")
-
         about = self.page.secoes.get(tipo=EventSection.SectionType.ABOUT)
         delete_response = self.client.get(reverse("admin:eventos_eventsection_delete", args=(about.pk,)))
         self.assertEqual(delete_response.status_code, 200)
+        confirmed_delete = self.client.post(
+            reverse("admin:eventos_eventsection_delete", args=(about.pk,)),
+            {"post": "yes"},
+        )
+        self.assertEqual(confirmed_delete.status_code, 302)
+        self.assertFalse(EventSection.objects.filter(pk=about.pk).exists())
+
+        add_response = self.client.get(reverse("admin:eventos_eventsection_add"))
+        self.assertEqual(add_response.status_code, 200)
+        self.assertContains(add_response, "Sobre a empresa")
+        self.assertNotContains(add_response, ">Marcas de chopp<")
+        self.assertNotContains(add_response, ">Dúvidas frequentes<")
+
+    def test_admin_section_list_hides_legacy_sections(self):
+        self.client.force_login(self.admin_user)
+        response = self.client.get(reverse("admin:eventos_eventsection_changelist"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Sobre a empresa")
+        self.assertContains(response, "Marcas de chopp")
+        self.assertNotContains(response, "Dúvidas frequentes")
+        self.assertNotContains(response, "Tipos de evento")
 
     def test_admin_hides_technical_page_fields(self):
         self.client.force_login(self.admin_user)
@@ -254,15 +269,32 @@ class AdminTests(TestCase):
         self.assertContains(response, "1600 × 1200 px")
         self.assertContains(response, "serão exibidas inteiras, sem deformação")
 
-    def test_generic_section_admin_allows_text_photo_or_video_items(self):
+    def test_legacy_section_is_not_available_in_simplified_admin(self):
         self.client.force_login(self.admin_user)
         occasions = self.page.secoes.get(tipo=EventSection.SectionType.OCCASIONS)
         response = self.client.get(reverse("admin:eventos_eventsection_change", args=(occasions.pk,)))
+        self.assertEqual(response.status_code, 302)
+
+    def test_brand_admin_only_shows_simple_text_items(self):
+        self.client.force_login(self.admin_user)
+        brands = self.page.secoes.get(tipo=EventSection.SectionType.BRANDS)
+        response = self.client.get(reverse("admin:eventos_eventsection_change", args=(brands.pk,)))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'name="midias-0-media_type"')
-        self.assertContains(response, 'name="midias-0-imagem"')
-        self.assertContains(response, 'name="midias-0-video_file"')
-        self.assertContains(response, 'name="conteudo_extra"')
+        self.assertContains(response, 'name="midias-0-titulo"')
+        self.assertContains(response, 'name="midias-0-descricao"')
+        self.assertNotContains(response, 'name="midias-0-media_type"')
+        self.assertNotContains(response, 'name="midias-0-imagem"')
+        self.assertNotContains(response, 'name="midias-0-video_file"')
+
+    def test_whatsapp_admin_only_shows_text_and_button(self):
+        self.client.force_login(self.admin_user)
+        whatsapp = self.page.secoes.get(tipo=EventSection.SectionType.WHATSAPP)
+        response = self.client.get(reverse("admin:eventos_eventsection_change", args=(whatsapp.pk,)))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="cta_text"')
+        self.assertContains(response, 'name="cta_url"')
+        self.assertNotContains(response, 'name="midias-0-titulo"')
+        self.assertNotContains(response, 'name="conteudo_extra"')
 
     def test_admin_can_change_title_and_public_page_reflects_it(self):
         self.client.force_login(self.admin_user)

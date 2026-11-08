@@ -22,6 +22,17 @@ class EventMediaInlineForm(forms.ModelForm):
         return cleaned_data
 
 
+class TextMediaInlineForm(forms.ModelForm):
+    class Meta:
+        model = EventMedia
+        exclude = ("media_type",)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        self.instance.media_type = EventMedia.MediaType.CONTENT
+        return cleaned_data
+
+
 MEDIA_INLINE_FIELDS = (
     "media_type",
     "titulo",
@@ -55,6 +66,22 @@ class VideoMediaInline(ImageMediaInline):
     pass
 
 
+class TextMediaInline(EventMediaInline):
+    form = TextMediaInlineForm
+    fields = ("titulo", "descricao", "ordem", "ativo")
+    classes = ()
+
+
+class BrandMediaInline(TextMediaInline):
+    verbose_name = "marca"
+    verbose_name_plural = "marcas"
+
+
+class KeywordMediaInline(TextMediaInline):
+    verbose_name = "palavra-chave"
+    verbose_name_plural = "palavras-chave"
+
+
 @admin.register(EventPage)
 class EventPageAdmin(admin.ModelAdmin):
     list_display = ("__str__", "atualizado_em", "hero_preview")
@@ -80,34 +107,60 @@ class EventPageAdmin(admin.ModelAdmin):
 
 @admin.register(EventSection)
 class EventSectionAdmin(admin.ModelAdmin):
-    list_display = ("titulo", "tipo", "ordem", "ativo")
-    list_filter = ("tipo",)
+    list_display = ("titulo", "tipo", "ativo")
+    list_filter = ("ativo",)
     search_fields = ("titulo", "descricao")
     ordering = ("ordem", "id")
     inlines = (EventMediaInline,)
 
     def get_fieldsets(self, request, obj=None):
-        structure_fields = ("pagina", "tipo") if obj is None else ()
+        if obj is None:
+            return (("Nova seção", {"fields": ("tipo", "titulo")}),)
+        content_fields = ("chamada", "titulo", "descricao")
+        if obj.tipo == EventSection.SectionType.ABOUT:
+            content_fields += ("conteudo_extra",)
+        if obj.tipo == EventSection.SectionType.WHATSAPP:
+            return (
+                ("Texto", {"fields": content_fields}),
+                ("Botão do WhatsApp", {"fields": ("cta_text", "cta_url")}),
+                ("Exibição", {"fields": ("ativo",)}),
+            )
         return (
-            ("Tipo de seção", {"fields": structure_fields + ("ordem", "ativo")}),
-            ("Conteúdo da seção", {"fields": ("chamada", "titulo", "subtitulo", "descricao", "conteudo_extra")}),
-            ("Botão opcional", {"fields": ("cta_text", "cta_url"), "classes": ("collapse",)}),
+            ("Texto", {"fields": content_fields}),
+            ("Exibição", {"fields": ("ativo",)}),
         )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(tipo__in=EventSection.PUBLIC_TYPES)
 
     def formfield_for_choice_field(self, db_field, request, **kwargs):
         if db_field.name == "tipo":
+            existing_types = set(EventSection.objects.filter(tipo__in=EventSection.PUBLIC_TYPES).values_list("tipo", flat=True))
             kwargs["choices"] = [
                 choice for choice in EventSection.SectionType.choices
-                if choice[0] in EventSection.PUBLIC_TYPES
+                if choice[0] in EventSection.PUBLIC_TYPES and choice[0] not in existing_types
             ]
         return super().formfield_for_choice_field(db_field, request, **kwargs)
 
     def get_inlines(self, request, obj):
+        if obj and obj.tipo == EventSection.SectionType.BRANDS:
+            return (BrandMediaInline,)
+        if obj and obj.tipo == EventSection.SectionType.KEYWORDS:
+            return (KeywordMediaInline,)
         if obj and obj.tipo == EventSection.SectionType.GALLERY:
             return (ImageMediaInline,)
         if obj and obj.tipo == EventSection.SectionType.VIDEOS:
             return (VideoMediaInline,)
-        return (EventMediaInline,) if obj else ()
+        return ()
+
+    def has_add_permission(self, request):
+        existing_types = set(EventSection.objects.filter(tipo__in=EventSection.PUBLIC_TYPES).values_list("tipo", flat=True))
+        return bool(EventPage.objects.exists() and set(EventSection.PUBLIC_TYPES) - existing_types) and super().has_add_permission(request)
+
+    def save_model(self, request, obj, form, change):
+        if not obj.pagina_id:
+            obj.pagina = EventPage.objects.first()
+        super().save_model(request, obj, form, change)
 
 admin.site.site_header = "Dona do Chopp — Administração"
 admin.site.site_title = "Dona do Chopp"
