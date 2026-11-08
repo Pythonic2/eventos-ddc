@@ -30,9 +30,9 @@ class EventPage(models.Model):
         help_text="Proporção ideal: 16:9, preferencialmente 1920 × 1080 px. Use MP4/WebM de até 100 MB; o vídeo será ajustado sem cortes.",
     )
     hero_cta_text = models.CharField("texto do botão principal", max_length=80, default="Quero chopp no meu evento")
-    hero_cta_url = models.CharField("destino do botão principal", max_length=500, default="#orcamento", validators=[validate_destination])
+    hero_cta_url = models.CharField("destino do botão principal", max_length=500, default="#whatsapp", validators=[validate_destination])
     secondary_cta_text = models.CharField("texto do botão secundário", max_length=80, default="Ver como fica", blank=True)
-    secondary_cta_url = models.CharField("destino do botão secundário", max_length=500, default="#galeria", blank=True, validators=[validate_destination])
+    secondary_cta_url = models.CharField("destino do botão secundário", max_length=500, default="#eventos", blank=True, validators=[validate_destination])
     seo_title = models.CharField("título para buscadores", max_length=180, default="Chopp para seu evento | Dona do Chopp")
     seo_description = models.CharField("descrição para buscadores", max_length=320, blank=True)
     ativo = models.BooleanField("página publicada", default=True)
@@ -60,6 +60,7 @@ class EventSection(models.Model):
     class SectionType(models.TextChoices):
         ABOUT = "empresa", "Sobre a empresa"
         BRANDS = "marcas", "Marcas de chopp"
+        EVENTS = "eventos", "Eventos — fotos e vídeos"
         KEYWORDS = "palavras_chave", "Palavras-chave"
         PRESENTATION = "apresentacao", "Vantagens"
         GALLERY = "galeria", "Galeria de fotos"
@@ -74,9 +75,7 @@ class EventSection(models.Model):
     PUBLIC_TYPES = (
         SectionType.ABOUT,
         SectionType.BRANDS,
-        SectionType.KEYWORDS,
-        SectionType.GALLERY,
-        SectionType.VIDEOS,
+        SectionType.EVENTS,
         SectionType.WHATSAPP,
     )
 

@@ -60,6 +60,27 @@ class BrandMediaInlineForm(forms.ModelForm):
         return cleaned_data
 
 
+class EventContentInlineForm(forms.ModelForm):
+    class Meta:
+        model = EventMedia
+        fields = "__all__"
+        labels = {
+            "media_type": "Tipo",
+            "titulo": "Título",
+            "imagem": "Foto",
+            "video_file": "Vídeo",
+            "thumbnail": "Capa do vídeo",
+            "ativo": "Visível",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["media_type"].choices = (
+            (EventMedia.MediaType.IMAGE, "Foto"),
+            (EventMedia.MediaType.VIDEO, "Vídeo"),
+        )
+
+
 MEDIA_INLINE_FIELDS = (
     "media_type",
     "titulo",
@@ -111,6 +132,14 @@ class BrandMediaInline(EventMediaInline):
 class KeywordMediaInline(TextMediaInline):
     verbose_name = "palavra-chave"
     verbose_name_plural = "palavras-chave"
+
+
+class EventContentInline(EventMediaInline):
+    form = EventContentInlineForm
+    fields = ("media_type", "titulo", "descricao", "imagem", "video_file", "thumbnail", "ativo")
+    classes = ()
+    verbose_name = "foto ou vídeo"
+    verbose_name_plural = "fotos e vídeos"
 
 
 @admin.register(EventPage)
@@ -181,12 +210,8 @@ class EventSectionAdmin(admin.ModelAdmin):
     def get_inlines(self, request, obj):
         if obj and obj.tipo == EventSection.SectionType.BRANDS:
             return (BrandMediaInline,)
-        if obj and obj.tipo == EventSection.SectionType.KEYWORDS:
-            return (KeywordMediaInline,)
-        if obj and obj.tipo == EventSection.SectionType.GALLERY:
-            return (ImageMediaInline,)
-        if obj and obj.tipo == EventSection.SectionType.VIDEOS:
-            return (VideoMediaInline,)
+        if obj and obj.tipo == EventSection.SectionType.EVENTS:
+            return (EventContentInline,)
         return ()
 
     def has_add_permission(self, request):

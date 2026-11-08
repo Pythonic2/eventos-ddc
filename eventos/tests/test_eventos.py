@@ -71,23 +71,23 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
 
     def test_only_active_media_is_shown_in_configured_order(self):
         page = EventPage.objects.get()
-        gallery = page.secoes.get(tipo=EventSection.SectionType.GALLERY)
+        events = page.secoes.get(tipo=EventSection.SectionType.EVENTS)
         EventMedia.objects.create(
-            secao=gallery,
+            secao=events,
             media_type=EventMedia.MediaType.IMAGE,
             imagem=SimpleUploadedFile("segunda.gif", GIF_BYTES, content_type="image/gif"),
             legenda="Segunda imagem",
             ordem=2,
         )
         EventMedia.objects.create(
-            secao=gallery,
+            secao=events,
             media_type=EventMedia.MediaType.IMAGE,
             imagem=SimpleUploadedFile("primeira.gif", GIF_BYTES, content_type="image/gif"),
             legenda="Primeira imagem",
             ordem=1,
         )
         EventMedia.objects.create(
-            secao=gallery,
+            secao=events,
             media_type=EventMedia.MediaType.IMAGE,
             imagem=SimpleUploadedFile("oculta.gif", GIF_BYTES, content_type="image/gif"),
             legenda="Imagem oculta",
@@ -113,7 +113,7 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         self.assertContains(response, 'type="application/ld+json"')
         self.assertContains(response, '"@type":"Service"')
         self.assertContains(response, "batizados")
-        self.assertContains(response, "Confraternizações")
+        self.assertContains(response, "confraternizações")
         self.assertContains(response, "Fortaleza–CE e Região Metropolitana")
 
     def test_whatsapp_uses_official_number_and_site_source(self):
@@ -125,18 +125,28 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         page = EventPage.objects.get()
         self.assertTrue(set(EventSection.PUBLIC_TYPES).issubset(set(page.secoes.values_list("tipo", flat=True))))
 
-        keywords = page.secoes.get(tipo=EventSection.SectionType.KEYWORDS)
-        keywords.titulo = "Palavras-chave alteradas no Admin"
-        keywords.conteudo_extra = "Texto complementar administrável"
-        keywords.save()
-        first_item = keywords.midias.first()
+        events = page.secoes.get(tipo=EventSection.SectionType.EVENTS)
+        events.titulo = "Eventos alterados no Admin"
+        events.descricao = "Fotos e vídeos administráveis"
+        events.save()
+        first_item = events.midias.first()
         first_item.titulo = "Card administrável"
         first_item.save()
 
         response = self.client.get(reverse("eventos:index"))
-        self.assertContains(response, "Palavras-chave alteradas no Admin")
-        self.assertContains(response, "Texto complementar administrável")
+        self.assertContains(response, "Eventos alterados no Admin")
+        self.assertContains(response, "Fotos e vídeos administráveis")
         self.assertContains(response, "Card administrável")
+
+    def test_public_page_has_only_four_managed_sections(self):
+        response = self.client.get(reverse("eventos:index"))
+        self.assertContains(response, 'id="empresa"')
+        self.assertContains(response, 'id="marcas"')
+        self.assertContains(response, 'id="eventos"')
+        self.assertContains(response, 'id="whatsapp"')
+        self.assertNotContains(response, 'id="palavras-chave"')
+        self.assertNotContains(response, 'id="galeria"')
+        self.assertNotContains(response, 'id="videos"')
 
     def test_deleted_or_inactive_standard_section_is_not_rendered(self):
         page = EventPage.objects.get()
@@ -262,6 +272,10 @@ class AdminTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Sobre a empresa")
         self.assertContains(response, "Marcas de chopp")
+        self.assertContains(response, "Eventos — fotos e vídeos")
+        self.assertNotContains(response, "Palavras-chave")
+        self.assertNotContains(response, "Galeria de fotos")
+        self.assertNotContains(response, ">Vídeos<")
         self.assertNotContains(response, "Dúvidas frequentes")
         self.assertNotContains(response, "Tipos de evento")
 
@@ -275,16 +289,17 @@ class AdminTests(TestCase):
         self.assertContains(response, "1920 × 1080 px")
         self.assertContains(response, "o vídeo será ajustado sem cortes")
 
-    def test_gallery_admin_shows_media_without_structural_fields(self):
+    def test_events_admin_combines_photo_and_video_fields(self):
         self.client.force_login(self.admin_user)
-        gallery = self.page.secoes.get(tipo=EventSection.SectionType.GALLERY)
-        response = self.client.get(reverse("admin:eventos_eventsection_change", args=(gallery.pk,)))
+        events = self.page.secoes.get(tipo=EventSection.SectionType.EVENTS)
+        response = self.client.get(reverse("admin:eventos_eventsection_change", args=(events.pk,)))
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="midias-0-media_type"')
         self.assertContains(response, 'name="midias-0-imagem"')
+        self.assertContains(response, 'name="midias-0-video_file"')
+        self.assertContains(response, 'name="midias-0-thumbnail"')
         self.assertNotContains(response, 'name="tipo"')
         self.assertNotContains(response, 'name="pagina"')
-        self.assertContains(response, "1600 × 1200 px")
-        self.assertContains(response, "serão exibidas inteiras, sem deformação")
 
     def test_legacy_section_is_not_available_in_simplified_admin(self):
         self.client.force_login(self.admin_user)

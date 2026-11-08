@@ -20,9 +20,7 @@ def event_page(request):
             "event_page": page,
             "about_section": sections.get(EventSection.SectionType.ABOUT),
             "brands_section": sections.get(EventSection.SectionType.BRANDS),
-            "keywords_section": sections.get(EventSection.SectionType.KEYWORDS),
-            "gallery_section": sections.get(EventSection.SectionType.GALLERY),
-            "videos_section": sections.get(EventSection.SectionType.VIDEOS),
+            "events_section": sections.get(EventSection.SectionType.EVENTS),
             "whatsapp_section": sections.get(EventSection.SectionType.WHATSAPP),
         },
     )
