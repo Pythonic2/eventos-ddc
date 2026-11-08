@@ -1,0 +1,43 @@
+DONA DO CHOPP | PÁGINA INICIAL
+
+A página inicial do projeto é prepage.html. No Django, ela é servida pela rota `/`.
+Ela apresenta as escolhas de contratar chopp para eventos ou comprar uma chopeira.
+
+O arquivo index.html permanece preservado como experiência cinematográfica alternativa,
+com transição 3D, zoom, parallax, camadas e partículas.
+
+Ação Eventos: eventos/index.html (página de eventos incluída)
+Ação Comprar: https://vendas.donadochopp.com.br/
+
+Os destinos ficam no objeto DESTINOS, próximo ao fim do arquivo index.html.
+O botão de pausar impede a troca automática. Em sistemas com redução de movimento
+habilitada, as animações são desativadas.
+
+Bootstrap, Bootstrap Icons e fontes web utilizam CDN e requerem internet.
+Para produção: substituir imagens ilustrativas por mídias autorizadas do cliente.
+
+BACKEND DJANGO (DESENVOLVIMENTO LOCAL):
+1. uv sync
+2. uv run python manage.py migrate
+3. uv run python manage.py createsuperuser
+4. uv run python manage.py runserver
+
+Página pública: http://127.0.0.1:8000/eventos/
+Admin: http://127.0.0.1:8000/admin/
+
+O SQLite (db.sqlite3), o ambiente virtual e os uploads em media/ são locais e
+ignorados pelo Git. Em produção, configure DJANGO_SECRET_KEY, DJANGO_DEBUG=false,
+DJANGO_ALLOWED_HOSTS e as opções DJANGO_SECURE_HSTS_* somente depois de confirmar
+HTTPS para o domínio e todos os subdomínios aplicáveis.
+
+O pyproject.toml e o uv.lock são a fonte oficial das dependências. Não use pip
+nem requirements.txt neste projeto. O Admin foi simplificado para o cliente
+editar títulos/textos e trocar fotos ou vídeos; estrutura, destinos e SEO ficam
+protegidos no código. As imagens atuais continuam no frontend até serem trocadas.
+
+VERSÃO AUTOMÁTICA:
+- A câmera oscila em loop sem depender do mouse.
+- Chopeira e bomba têm movimento suave de aproximação.
+- Alternância entre eventos e comprar ocorre automaticamente a cada 7,5 segundos.
+- Botão de pausa interrompe os movimentos e a alternância.
+- Respeita preferência do sistema por movimento reduzido.

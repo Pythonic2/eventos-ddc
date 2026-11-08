@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#210e0e">
+<meta name="description" content="Dona do Chopp: chopp para aniversários, casamentos, batizados, confraternizações e eventos em Fortaleza–CE e Região Metropolitana, além de chopeiras para comprar.">
+<meta name="keywords" content="chopp para eventos Fortaleza, chopp para festa, chopeira para eventos, chopp aniversário, chopp casamento, chopp batizado, chopp confraternização, comprar chopeira">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="geo.region" content="BR-CE"><meta name="geo.placename" content="Fortaleza">
+<meta property="og:locale" content="pt_BR"><meta property="og:type" content="website"><meta property="og:site_name" content="Dona do Chopp">
+<meta property="og:title" content="Chopp para Eventos em Fortaleza–CE | Dona do Chopp"><meta property="og:description" content="Chopp gelado para festas e eventos em Fortaleza e Região Metropolitana ou chopeiras Dona do Chopp para comprar.">
+<meta property="og:image" content="assets/fotoboa1.jpg"><meta property="og:image:alt" content="Pessoas brindando com copos de chopp em um evento">
+<title>Chopp para Eventos em Fortaleza–CE | Dona do Chopp</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--red:#ed1537;--red-dark:#9d001b;--yellow:#ffca21;--cream:#fff3cf;--white:#fffaf3;--ease:cubic-bezier(.19,1,.22,1)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;}body{background:#21130c;color:#fff;font-family:'DM Sans',system-ui,sans-serif;overflow-x:hidden}button,a{-webkit-tap-highlight-color:transparent}a:focus-visible,button:focus-visible{outline:3px solid #fff;outline-offset:5px}
+.cinema{min-height:100svh;isolation:isolate;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#2b130d}
+.scene{position:absolute;inset:0;z-index:-2;pointer-events:none;overflow:hidden;perspective:950px;transform-style:preserve-3d}
+.layer{position:absolute;inset:-7%;transition:transform 1550ms var(--ease),opacity 950ms ease,filter 1250ms ease;will-change:transform,opacity}
+.photo-event{background:url('assets/eventos-ambiente-limpo.png') 58% 46% /cover no-repeat;filter:saturate(1.12) contrast(1.04) brightness(.78);transform:scale(1.04);opacity:1}
+.photo-event::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(24,8,3,.96) 0%,rgba(35,12,4,.88) 30%,rgba(31,10,3,.45) 57%,rgba(17,5,2,.06) 82%),linear-gradient(180deg,rgba(15,4,2,.48) 0%,transparent 24%,transparent 70%,rgba(17,5,2,.42) 100%)}
+.photo-buy{background:radial-gradient(circle at 76% 45%,#ffdc6a 0 8%,#c83418 28%,#6c0c13 57%,#21070a 82%);opacity:0;transform:scale(1.22)}
+.photo-buy::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 62px,rgba(255,210,80,.055) 63px 65px),linear-gradient(110deg,rgba(20,3,5,.76) 0 37%,transparent 64%)}
+.photo-buy::after{content:"";position:absolute;right:4%;top:1%;width:min(48vw,680px);aspect-ratio:1;border:1px solid rgba(255,225,129,.16);border-radius:50%;box-shadow:0 0 0 72px rgba(255,214,90,.035),0 0 0 145px rgba(255,214,90,.025)}
+.vignette{position:absolute;inset:0;background:linear-gradient(90deg,rgba(19,7,6,.72) 0%,rgba(29,10,8,.48) 42%,rgba(22,8,6,.05) 85%),linear-gradient(0deg,rgba(19,7,6,.72) 0%,transparent 33%);z-index:1;transition:background 1s}
+.halo{position:absolute;right:7%;top:18%;width:48vw;height:58vh;border-radius:50%;filter:blur(75px);background:#ffc34355;opacity:.75;transition:transform 1200ms var(--ease),background 1s;}
+.particles{position:absolute;inset:0;overflow:hidden;opacity:.65}.particle{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);border-radius:50%;background:#ffdca0;box-shadow:0 0 21px 6px #ffc46a55;animation:drift var(--d) ease-in-out infinite alternate;animation-delay:var(--delay)}@keyframes drift{to{transform:translate3d(12px,-25px,0);opacity:.3}}
+.foreground{position:absolute;width:min(59vw,800px);height:77vh;right:2%;bottom:0;z-index:2;pointer-events:none;transform-style:preserve-3d;perspective:900px}
+.subject{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;transform-origin:55% 65%;will-change:transform,opacity;transition:transform 1500ms var(--ease),opacity 850ms ease,filter 1100ms ease}
+.subject img{display:block;object-fit:contain;object-position:center bottom;width:100%;height:100%;filter:drop-shadow(0 36px 45px #120907b0)}
+.subject.event{transform:translate3d(1%,12%,0) scale(.91);opacity:0;z-index:2}
+.subject.buy{transform:translate3d(43%,14%,0) scale(.42) rotateY(-16deg) rotateZ(3deg);opacity:0;z-index:1}
+.subject.buy::before{content:"";position:absolute;left:15%;right:2%;bottom:5%;height:22%;border-radius:50%;background:#ffb20b66;filter:blur(55px);transform:scale(.72);opacity:0;transition:opacity 1s ease,transform 1.4s var(--ease)}
+.subject.buy img{max-width:680px;filter:drop-shadow(0 38px 28px rgba(11,0,0,.55)) drop-shadow(0 0 26px rgba(255,184,34,.18))}
+.cinema[data-scene="comprar"] .photo-event{opacity:0;transform:scale(1.48) translateX(-5%);filter:blur(9px) brightness(.45)}
+.cinema[data-scene="comprar"] .photo-buy{opacity:1;transform:scale(1)}
+.cinema[data-scene="comprar"] .subject.event{opacity:0;transform:translate3d(-28%,20%,0) scale(1.4) rotateY(8deg);filter:blur(7px)}
+.cinema[data-scene="comprar"] .subject.buy{opacity:1;transform:translate3d(2%,3%,0) scale(1.04) rotateY(0) rotateZ(0)}
+.cinema[data-scene="comprar"] .subject.buy::before{opacity:1;transform:scale(1)}
+.cinema[data-scene="comprar"] .halo{transform:translateX(-18%);background:#ff2f435b}
+.cinema[data-scene="comprar"] .vignette{background:linear-gradient(90deg,rgba(23,8,8,.94),rgba(43,11,9,.66) 49%,rgba(43,11,9,.08)),linear-gradient(0deg,rgba(19,7,6,.85),transparent 35%)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:clamp(18px,3vw,32px) clamp(22px,5vw,88px);z-index:8}.brand{display:flex;align-items:center;gap:12px;font-family:Outfit,sans-serif;font-weight:900;font-size:clamp(1.1rem,2vw,1.45rem);color:white;text-decoration:none}.brand i{color:var(--yellow);font-size:1.65rem}.brand:hover{color:white}.top-text{font-size:.77rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#ffe5a7}
+.main-area{width:100%;flex:1;position:relative;z-index:4;display:flex;align-items:center;padding:25px clamp(22px,7vw,120px) 54px}.copy{max-width:660px;position:relative}.kicker{display:inline-block;font-weight:800;color:#ffcf36;letter-spacing:.17em;text-transform:uppercase;font-size:.8rem;margin-bottom:16px}.copy h1{font-family:Outfit,sans-serif;font-weight:900;font-size:clamp(2.8rem,5.5vw,6.4rem);line-height:.94;letter-spacing:-.065em;margin:0 0 18px;text-wrap:balance}.copy h1 em{font-style:normal;color:#ffce33}.description{color:#fff3e5;max-width:500px;font-size:clamp(.97rem,1.35vw,1.12rem);line-height:1.55;margin-bottom:22px;text-shadow:0 2px 12px #23100c}.cta{border-radius:60px;text-decoration:none;display:inline-flex;align-items:center;gap:16px;padding:17px 24px;font-size:clamp(.98rem,1.2vw,1.13rem);font-weight:900;transition:transform .2s,box-shadow .2s;background:linear-gradient(120deg,#f71942,#ae001f);box-shadow:0 18px 40px #1b030955;color:white}.cta i:last-child{font-size:1.25rem}.cta:hover{transform:translateY(-4px);box-shadow:0 23px 48px #1b030977;color:white}.cinema[data-scene="comprar"] .cta{color:#491107;background:linear-gradient(120deg,#ffe16c,#ffb500);box-shadow:0 17px 40px #2410047c}.cinema[data-scene="comprar"] .cta:hover{color:#491107}
+.escolhas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:min(650px,100%);margin:0 0 20px}.escolha{position:relative;min-height:98px;border:1px solid #ffffff52;border-radius:19px;padding:15px 16px;display:grid;grid-template-columns:42px 1fr;gap:11px;text-align:left;color:#fff;background:rgba(20,5,4,.72);backdrop-filter:blur(15px);cursor:pointer;font:inherit;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}.escolha:hover{transform:translateY(-3px);border-color:#ffcf36}.escolha.active{color:#401004;background:linear-gradient(135deg,#ffe376,#ffbd10);border-color:#fff2af;box-shadow:0 12px 32px #16060466}.escolha-icone{grid-row:1/3;width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:#ffffff17;font-size:1.2rem}.escolha.active .escolha-icone{background:#8c00151a}.escolha strong{align-self:end;font-family:Outfit,sans-serif;font-size:1.05rem;line-height:1.05}.escolha small{align-self:start;color:#f8dcca;font-size:.73rem;font-weight:700;line-height:1.2}.escolha.active small{color:#652312}.local{position:absolute;right:10px;top:-10px;padding:4px 8px;border-radius:999px;background:#e80d35;color:#fff;font-size:.6rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 5px 14px #28030966}
+.copy-swap{animation:showcopy .65s both}@keyframes showcopy{from{opacity:0;transform:translateY(28px);filter:blur(8px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+/* Breve zoom que faz o objeto avançar para o visitante ao trocar de cena */
+.cinema.burst .foreground{animation:stageZoom 1300ms var(--ease)}.cinema.burst::after{content:"";position:absolute;z-index:3;inset:-40%;pointer-events:none;background:linear-gradient(105deg,transparent 43%,rgba(255,215,83,.24) 49%,rgba(255,255,255,.32) 50%,transparent 57%);transform:translateX(-70%) rotate(-5deg);animation:lightSweep 1100ms ease-out both}@keyframes stageZoom{0%{transform:translateZ(0) scale(.92)}40%{transform:translateZ(100px) scale(1.15)}100%{transform:translateZ(0) scale(1)}}@keyframes lightSweep{to{transform:translateX(70%) rotate(-5deg)}}
+/* Câmera virtual: oscila sozinha mesmo quando o visitante não move o mouse. */
+.scene{transform:translate3d(calc(var(--mx, 0px)*-.32),calc(var(--my, 0px)*-.32),0) scale(var(--bgzoom,1.05));transition:transform .12s linear}
+.foreground{transform:translate3d(var(--mx,0px),var(--my,0px),0) scale(var(--fgzoom,1));transition:transform .12s linear}
+/* Respiração da cena: chopeira e bomba aproximam-se levemente e recuam em loop. */
+.subject img{animation:productBreathe 5.8s ease-in-out infinite alternate;transform-origin:50% 72%}
+.subject.buy img{animation-duration:7s;animation-delay:-1.8s}
+@keyframes productBreathe{from{transform:translate3d(0,1%,0) scale(1)}to{transform:translate3d(0,-1.4%,0) scale(1.045)}}
+/* Acabamento editorial e leitura mais forte sobre as duas cenas. */
+.copy{max-width:620px}.kicker{display:inline-flex;align-items:center;gap:10px;font-size:.76rem}.kicker::before{content:"";width:34px;height:2px;background:currentColor;box-shadow:0 0 12px currentColor}.copy h1{line-height:.92;text-shadow:0 12px 38px rgba(20,3,3,.3)}.copy h1 em{background:linear-gradient(105deg,#fff1a7,#ffbe0b);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}.description{max-width:470px}.cta{border:1px solid rgba(255,255,255,.13)}.cta i:last-child{transition:transform .25s}.cta:hover i:last-child{transform:translateX(4px)}
+/* Permite pausar toda a experiência se a pessoa desejar. */
+.cinema.motion-paused .subject img,.cinema.motion-paused .particle{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){.scene,.foreground{transition:none!important}.subject img{animation:none!important}}
+
+@media(max-width:850px){.topbar{padding:18px 20px}.top-text{display:none}.cinema{min-height:100svh}.photo-event{background-position:68% center}.photo-event::before{background:linear-gradient(180deg,rgba(24,8,3,.92) 0%,rgba(28,9,3,.66) 47%,rgba(17,5,2,.35) 100%)}.foreground{width:105vw;height:56vh;right:-15%;bottom:5%;opacity:.72}.subject.event{transform:translateY(12%) scale(.9)}.cinema[data-scene="comprar"] .subject.buy{transform:translate3d(7%,15%,0) scale(.92)}.vignette{background:linear-gradient(180deg,#200a08e8 0%,#27100ab5 55%,#170906d6 100%)}.main-area{align-items:flex-start;padding:3vh 20px 28px}.copy h1{font-size:clamp(2.6rem,9vw,4.7rem)}.copy{max-width:600px}.description{max-width:430px}}
+@media(max-width:560px){.main-area{padding:2vh 16px 24px}.copy h1{font-size:clamp(2.55rem,11vw,4rem)}.description{font-size:.91rem;margin-bottom:15px;line-height:1.4;max-width:330px}.foreground{height:45vh;right:-18%;bottom:8%;width:120vw;opacity:.58}.kicker{margin-bottom:10px}.escolhas{grid-template-columns:1fr;gap:8px;margin-bottom:14px}.escolha{min-height:70px;padding:11px 13px;grid-template-columns:36px 1fr}.escolha-icone{width:36px;height:36px}.escolha strong{font-size:.96rem}.cta{padding:14px 17px;width:100%;justify-content:center}.local{top:7px;right:8px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.subject,.photo-event,.photo-buy{will-change:auto}}
+</style>
+</head>
+<body>
+<main id="cinema" class="cinema" data-scene="eventos">
+ <div class="scene" aria-hidden="true"><div class="layer photo-event"></div><div class="layer photo-buy"></div><div class="halo"></div><div class="particles" id="particles"></div><div class="vignette"></div></div>
+ <div class="foreground" aria-hidden="true"><div class="subject event"><img src="assets/chopeira-eletrica-copao.png" alt=""></div><div class="subject buy"><img src="assets/bomba-dona-do-chopp.png" alt=""></div></div>
+ <header class="topbar"><a class="brand" href="./index.html"><i class="bi bi-cup-straw"></i> Dona do Chopp</a><div class="top-text">Escolha sua experiência</div></header>
+ <section class="main-area" aria-live="polite"><div class="copy" id="copy"><div class="kicker" id="eyebrow">Chopp no seu evento • Fortaleza</div><h1 id="headline">O seu evento merece <em>chopp gelado.</em></h1><p class="description" id="description">Leve chopp gelado e a estrutura completa para sua festa em Fortaleza.</p>
+  <div class="escolhas" role="group" aria-label="O que você procura?">
+   <button type="button" class="escolha active" data-go="eventos" aria-pressed="true"><span class="local">Fortaleza + Região Metropolitana</span><i class="bi bi-calendar2-heart escolha-icone" aria-hidden="true"></i><strong>Chopp para meu evento</strong><small>Contratar chopp e estrutura para a festa</small></button>
+   <button type="button" class="escolha" data-go="comprar" aria-pressed="false"><i class="bi bi-bag-check escolha-icone" aria-hidden="true"></i><strong>Comprar uma chopeira</strong><small>Conhecer modelos e comprar o equipamento</small></button>
+  </div>
+  <a class="cta" id="action" href="eventos/index.html"><i class="bi bi-calendar2-heart"></i><span id="action-label">Pedir orçamento para meu evento</span><i class="bi bi-arrow-right"></i></a></div></section>
+</main>
+<script>
+'use strict';
+// ALTERE AQUI OS DESTINOS CONFORME A PUBLICAÇÃO.
+const DESTINOS = { eventos:'eventos/index.html', comprar:'https://vendas.donadochopp.com.br/' };
+const CENAS={
+ eventos:{eyebrow:'Chopp no seu evento • Fortaleza',headline:'O seu evento merece <em>chopp gelado.</em>',description:'Leve chopp gelado e a estrutura completa para sua festa em Fortaleza.',label:'Pedir orçamento para meu evento',icon:'bi-calendar2-heart',url:DESTINOS.eventos},
+ comprar:{eyebrow:'Compre sua própria chopeira',headline:'Sua própria chopeira. <em>Seu próximo passo.</em>',description:'Conheça os modelos Dona do Chopp e compre o equipamento ideal para servir e vender.',label:'Ver chopeiras para comprar',icon:'bi-bag-check',url:DESTINOS.comprar}
+};
+const root=document.querySelector('#cinema'),copy=document.querySelector('#copy'),eyebrow=document.querySelector('#eyebrow'),headline=document.querySelector('#headline'),description=document.querySelector('#description'),action=document.querySelector('#action'),actionLabel=document.querySelector('#action-label'),buttons=[...document.querySelectorAll('[data-go]')];
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;let active='eventos',animTimer=null,animationFrame=0;
+function setScene(name){if(name===active)return;active=name;const data=CENAS[name];root.dataset.scene=name;eyebrow.textContent=data.eyebrow;headline.innerHTML=data.headline;description.textContent=data.description;actionLabel.textContent=data.label;action.href=data.url;action.querySelector('i').className='bi '+data.icon;copy.classList.remove('copy-swap');void copy.offsetWidth;copy.classList.add('copy-swap');buttons.forEach(b=>{const on=b.dataset.go===name;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))});if(!reduced){root.classList.remove('burst');void root.offsetWidth;root.classList.add('burst');clearTimeout(animTimer);animTimer=setTimeout(()=>root.classList.remove('burst'),1350)}}
+buttons.forEach(b=>b.addEventListener('click',()=>setScene(b.dataset.go)));
+const colors=[...Array(17)].map((_,i)=>{const d=document.createElement('span');d.className='particle';d.style.cssText=`--x:${(i*37+13)%99}%;--y:${(i*29+8)%85}%;--s:${3+i%4*2}px;--d:${3+i%5}s;--delay:${-i*.7}s`;document.getElementById('particles').appendChild(d);return d});
+// Movimento contínuo automático: câmera, fundo e primeiro plano mexem sozinhos.
+// Alterar os números de amplitude abaixo para deixar a animação mais sutil ou intensa.
+let mouseX=0,mouseY=0;
+if(!reduced){
+  document.addEventListener('pointermove',e=>{
+    // O mouse é apenas um pequeno reforço; a animação funciona sem interação.
+    mouseX=(e.clientX/innerWidth-.5)*5;
+    mouseY=(e.clientY/innerHeight-.5)*3;
+  },{passive:true});
+  const start=performance.now();
+  const animate=(now)=>{
+    if(!document.hidden){
+      const t=(now-start)/1000;
+      const slow=Math.sin(t*.38),orbit=Math.cos(t*.46),depth=Math.sin(t*.52);
+      const desktop=innerWidth>=900;
+      const dx=slow*(desktop?19:7)+(desktop?mouseX:0);
+      const dy=orbit*(desktop?12:5)+(desktop?mouseY:0);
+      root.style.setProperty('--mx',dx.toFixed(2)+'px');
+      root.style.setProperty('--my',dy.toFixed(2)+'px');
+      root.style.setProperty('--bgzoom',(1.075+depth*.025).toFixed(4));
+      root.style.setProperty('--fgzoom',(1.015+Math.cos(t*.5)*.025).toFixed(4));
+    }
+    animationFrame=requestAnimationFrame(animate);
+  };
+  animationFrame=requestAnimationFrame(animate);
+}
+</script>
+</body></html>

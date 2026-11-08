@@ -1,0 +1,14 @@
+.git
+.env
+.venv
+.uv-cache
+__pycache__
+*.py[cod]
+db.sqlite3
+media
+staticfiles
+.pytest_cache
+.coverage
+*.log
+*.Zone.Identifier
+*:Zone.Identifier

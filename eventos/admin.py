@@ -1,0 +1,109 @@
+from django.contrib import admin
+from django import forms
+from django.utils.html import format_html
+
+from .models import EventMedia, EventPage, EventSection
+
+
+class EventMediaInlineForm(forms.ModelForm):
+    class Meta:
+        model = EventMedia
+        exclude = ("media_type",)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        section = getattr(self.instance, "secao", None)
+        if section:
+            self.instance.media_type = (
+                EventMedia.MediaType.VIDEO
+                if section.tipo == EventSection.SectionType.VIDEOS
+                else EventMedia.MediaType.IMAGE
+            )
+        return cleaned_data
+
+
+MEDIA_INLINE_FIELDS = (
+    "media_type",
+    "titulo",
+    "descricao",
+    "imagem",
+    "image_url",
+    "video_file",
+    "video_url",
+    "thumbnail",
+    "thumbnail_url",
+    "legenda",
+    "texto_alternativo",
+    "ordem",
+    "ativo",
+)
+
+
+class EventMediaInline(admin.StackedInline):
+    model = EventMedia
+    extra = 1
+    fields = MEDIA_INLINE_FIELDS
+    classes = ("collapse",)
+
+
+class ImageMediaInline(EventMediaInline):
+    form = EventMediaInlineForm
+    fields = tuple(field for field in MEDIA_INLINE_FIELDS if field != "media_type")
+
+
+class VideoMediaInline(ImageMediaInline):
+    pass
+
+
+@admin.register(EventPage)
+class EventPageAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "atualizado_em", "hero_preview")
+    search_fields = ("titulo", "subtitulo", "descricao")
+    readonly_fields = ("atualizado_em", "hero_preview")
+    fieldsets = (
+        ("Atualização", {"fields": ("atualizado_em",)}),
+        ("Hero", {"fields": ("subtitulo", "titulo", "descricao", "hero_image", "hero_video", "hero_preview")}),
+    )
+
+    @admin.display(description="Prévia")
+    def hero_preview(self, obj):
+        if obj and obj.hero_image:
+            return format_html('<img src="{}" alt="" style="height:100px;width:180px;object-fit:contain;background:#21130c;border-radius:8px">', obj.hero_image.url)
+        return "Sem imagem"
+
+    def has_add_permission(self, request):
+        return not EventPage.objects.exists() and super().has_add_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(EventSection)
+class EventSectionAdmin(admin.ModelAdmin):
+    list_display = ("titulo", "tipo")
+    list_filter = ("tipo",)
+    search_fields = ("titulo", "descricao")
+    ordering = ("ordem", "id")
+    inlines = (EventMediaInline,)
+    fieldsets = (
+        ("Conteúdo da seção", {"fields": ("chamada", "titulo", "subtitulo", "descricao", "conteudo_extra")}),
+        ("Botão opcional", {"fields": ("cta_text", "cta_url"), "classes": ("collapse",)}),
+    )
+
+    def get_inlines(self, request, obj):
+        if obj and obj.tipo == EventSection.SectionType.GALLERY:
+            return (ImageMediaInline,)
+        if obj and obj.tipo == EventSection.SectionType.VIDEOS:
+            return (VideoMediaInline,)
+        return (EventMediaInline,) if obj else ()
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+admin.site.site_header = "Dona do Chopp — Administração"
+admin.site.site_title = "Dona do Chopp"
+admin.site.index_title = "Conteúdo do site"

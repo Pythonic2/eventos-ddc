@@ -1,0 +1,29 @@
+services:
+  eventos-ddc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: eventos-ddc
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DJANGO_ENV: production
+      DEBUG: "false"
+      PORT: "8080"
+      GCS_APP_PREFIX: eventos-ddc
+      RUN_MIGRATIONS: "false"
+    ports:
+      - "8011:8080"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz/', timeout=5)"]
+      interval: 30s
+      timeout: 8s
+      retries: 3
+      start_period: 30s
+    networks:
+      - pi_default
+
+networks:
+  pi_default:
+    external: true
