@@ -14,6 +14,7 @@ O Admin possui uma seção de promoção sem campo de valor e limitada a uma ins
 - RB-04: cada promoção aceita zero ou mais itens ativos de texto, foto ou vídeo, ordenados por `ordem` e `id`.
 - RB-05: somente promoções e itens ativos aparecem no frontend.
 - RB-06: uploads continuam sujeitos aos validadores existentes e ao storage configurado.
+- RB-07: o botão de cada promoção abre o WhatsApp oficial com título, valor e descrição preenchidos na mensagem.
 
 ## Cenários de aceitação
 - AC-01 — Dada uma promoção existente, quando o administrador abre a listagem, então ela aparece mesmo estando invisível no site.
@@ -23,6 +24,9 @@ O Admin possui uma seção de promoção sem campo de valor e limitada a uma ins
 - AC-05 — Dada uma promoção ativa com itens de texto, foto e vídeo ativos, quando a página é aberta, então todos aparecem em ordem e com controles apropriados.
 - AC-06 — Dada uma promoção inativa, quando a página é aberta, então ela não aparece.
 - AC-07 — Dado o deploy aprovado, quando a migration é aplicada uma única vez no schema `eventosddc`, então nenhuma linha existente é apagada e o Cloud Run atualizado responde saudável.
+- AC-08 — Dada uma promoção com título, valor e descrição, quando o visitante aciona o CTA, então o link abre o WhatsApp oficial com esses dados codificados na mensagem.
+- AC-09 — Dado o domínio público com origem Raspberry, quando uma versão antiga atende a página, então a divergência é reportada e a publicação do Raspberry não é presumida sem autorização.
+- AC-10 — Dada uma promoção com mídias e itens de texto, quando renderizada, então a primeira mídia válida aparece em destaque, textos preenchidos aparecem de forma compacta e itens vazios não geram cards.
 
 ## Requisitos não funcionais
 - Segurança: somente usuários autorizados do Django Admin gerenciam promoções; validação de uploads e destinos de CTA permanece no servidor.
@@ -43,4 +47,7 @@ O Admin possui uma seção de promoção sem campo de valor e limitada a uma ins
 | AC-01 | `test_admin_section_list_hides_legacy_sections` | passou |
 | AC-02/AC-03 | `test_promotions_can_repeat_but_structural_sections_remain_unique` | passou |
 | AC-04/AC-05/AC-06 | testes de promoção da `EventPageViewTests` | passou |
-| AC-07 | migration + verificações pós-deploy | pendente |
+| AC-07 | migration `0013`, build e revisão `00019` | passou |
+| AC-08 | `test_promotion_whatsapp_url_contains_encoded_promotion_data` | passou |
+| AC-09 | comparação dos HTMLs/headers das origens | passou |
+| AC-10 | `test_multiple_promotions_render_with_text_photo_and_video` | passou |

@@ -24,6 +24,22 @@ def event_page(request):
             for section in loaded_sections
             if section.tipo == EventSection.SectionType.PROMOTION
         ]
+        for promotion in promotion_sections:
+            media_items = list(promotion.midias.all())
+            visual_media = [
+                media
+                for media in media_items
+                if (media.media_type == EventMedia.MediaType.IMAGE and media.image_source)
+                or (media.media_type == EventMedia.MediaType.VIDEO and media.video_source)
+            ]
+            promotion.featured_media = visual_media[0] if visual_media else None
+            promotion.additional_media = visual_media[1:]
+            promotion.text_items = [
+                media
+                for media in media_items
+                if media.media_type == EventMedia.MediaType.CONTENT
+                and (media.titulo.strip() or media.descricao.strip())
+            ]
     return render(
         request,
         "eventos/index.html",

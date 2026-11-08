@@ -11,6 +11,7 @@
 - Admin: manter tipos estruturais singulares; oferecer `Promoção` sempre; usar inline rico com texto, foto e vídeo.
 - View: separar seções estruturais singulares de uma lista ordenada de promoções.
 - Template: iterar promoções e suas mídias ativas prefetched.
+- CTA: gerar no servidor uma URL `wa.me` para o número oficial, codificando título, valor e descrição e limitando o texto livre enviado.
 - Deploy: migration aditiva no schema `eventosddc`, commit/push na `main`, aguardar o trigger único do Cloud Build e validar a revisão.
 
 ## Alternativas e justificativa
@@ -27,6 +28,7 @@
 - Unitários: constraint condicional, valor e tipos de mídia.
 - Integração: Admin, view pública, visibilidade e ordenação.
 - Segurança: usuário comum continua sem acesso; uploads/URLs usam validadores existentes.
+- Segurança do CTA: texto administrável será tratado como dado e codificado como query string, sem HTML seguro ou redirecionamento configurável.
 - Rollback: direcionar tráfego para a revisão anterior; não reverter banco automaticamente.
 
 ## Dependências e decisões

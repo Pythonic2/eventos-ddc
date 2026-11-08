@@ -205,7 +205,7 @@ class EventSectionAdmin(admin.ModelAdmin):
         if obj.tipo == EventSection.SectionType.PROMOTION:
             return (
                 ("Promoção", {"fields": ("chamada", "titulo", "valor", "subtitulo", "descricao", "conteudo_extra")}),
-                ("Botão", {"fields": ("cta_text", "cta_url")}),
+                ("Botão do WhatsApp", {"fields": ("cta_text",)}),
                 ("Exibição", {"fields": ("ordem", "ativo")}),
             )
         if obj.tipo == EventSection.SectionType.WHATSAPP:

@@ -1,6 +1,7 @@
 import shutil
 import tempfile
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
@@ -171,6 +172,8 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         self.assertContains(response, promotion.titulo)
         self.assertContains(response, "R$ 199,90")
         self.assertContains(response, "Descrição da promoção ativa")
+        self.assertContains(response, f'href="https://wa.me/5585991803678?text=')
+        self.assertContains(response, 'target="_blank"')
 
     def test_multiple_promotions_render_with_text_photo_and_video(self):
         page = EventPage.objects.get()
@@ -210,12 +213,21 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
             video_file=SimpleUploadedFile("promocao.mp4", MP4_BYTES, content_type="video/mp4"),
             ordem=3,
         )
+        EventMedia.objects.create(
+            secao=second,
+            media_type=EventMedia.MediaType.CONTENT,
+            ordem=4,
+        )
 
         content = self.client.get(reverse("eventos:index")).content.decode()
 
         self.assertLess(content.index(first.titulo), content.index(second.titulo))
-        self.assertLess(content.index(text.titulo), content.index(photo.titulo))
-        self.assertLess(content.index(photo.titulo), content.index(video.titulo))
+        self.assertIn('class="promotion-card"', content)
+        self.assertIn('class="promotion-visual"', content)
+        self.assertIn('class="promotion-note"', content)
+        self.assertIn(text.titulo, content)
+        self.assertIn(photo.titulo, content)
+        self.assertIn(video.titulo, content)
         self.assertIn(photo.image_source, content)
         self.assertIn(video.video_source, content)
         self.assertIn('type="video/mp4"', content)
@@ -334,6 +346,26 @@ class ModelValidationTests(TemporaryMediaMixin, TestCase):
         )
         with self.assertRaises(ValidationError):
             duplicate_about.full_clean()
+
+    def test_promotion_whatsapp_url_contains_encoded_promotion_data(self):
+        page = EventPage.objects.get()
+        promotion = page.secoes.get(tipo=EventSection.SectionType.PROMOTION)
+        promotion.titulo = "Chopp & festa"
+        promotion.valor = "R$ 120"
+        promotion.descricao = "Condição especial para o evento."
+
+        parsed = urlparse(promotion.promotion_whatsapp_url)
+        message = parse_qs(parsed.query)["text"][0]
+
+        self.assertEqual(parsed.netloc, "wa.me")
+        self.assertEqual(parsed.path, "/5585991803678")
+        self.assertIn("*Promoção:* Chopp & festa", message)
+        self.assertIn("*Valor:* R$ 120", message)
+        self.assertIn("*Detalhes:* Condição especial para o evento.", message)
+
+        promotion.valor = "120"
+        self.assertEqual(promotion.promotion_display_value, "R$ 120")
+        self.assertIn("*Valor:* R$ 120", parse_qs(urlparse(promotion.promotion_whatsapp_url).query)["text"][0])
 
     def test_image_requires_an_image_file(self):
         page = EventPage.objects.get()
@@ -462,6 +494,8 @@ class AdminTests(TestCase):
         self.assertContains(response, ">Texto<")
         self.assertContains(response, ">Foto<")
         self.assertContains(response, ">Vídeo<")
+        self.assertContains(response, "Botão do WhatsApp")
+        self.assertNotContains(response, 'name="cta_url"')
 
     def test_legacy_section_is_not_available_in_simplified_admin(self):
         self.client.force_login(self.admin_user)

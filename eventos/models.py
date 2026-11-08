@@ -1,5 +1,8 @@
+import re
 from pathlib import Path
+from urllib.parse import urlencode
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -115,6 +118,27 @@ class EventSection(models.Model):
 
     def __str__(self):
         return f"{self.get_tipo_display()}: {self.titulo}"
+
+    @property
+    def promotion_whatsapp_url(self):
+        description = " ".join(self.descricao.split())[:500]
+        message = [
+            "Olá! Vim pelo site de eventos da Dona do Chopp e quero aproveitar esta promoção:",
+            "",
+            f"*Promoção:* {self.titulo}",
+        ]
+        if self.promotion_display_value:
+            message.append(f"*Valor:* {self.promotion_display_value}")
+        if description:
+            message.append(f"*Detalhes:* {description}")
+        return f"https://wa.me/{settings.WHATSAPP_NUMBER}?{urlencode({'text': chr(10).join(message)})}"
+
+    @property
+    def promotion_display_value(self):
+        value = self.valor.strip()
+        if re.fullmatch(r"\d+(?:[.,]\d{1,2})?", value):
+            return f"R$ {value}"
+        return value
 
 
 class EventMedia(models.Model):

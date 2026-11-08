@@ -114,6 +114,7 @@ GCS_SIGNED_URL_CACHE_TTL = max(min(GCS_SIGNED_URL_TTL - 60, 840), 1)
 GCS_IAM_SIGN_BLOB = env_bool("GCS_IAM_SIGN_BLOB", True)
 GCS_SA_EMAIL = os.environ.get("GCS_SA_EMAIL", "")
 MEDIA_MAX_UPLOAD_SIZE = int(os.environ.get("MEDIA_MAX_UPLOAD_SIZE", str(100 * 1024 * 1024)))
+WHATSAPP_NUMBER = "5585991803678"
 if GCS_ENABLED:
     required_gcs = {"GCS_BUCKET_NAME": GCS_BUCKET_NAME, "GCS_PROJECT_ID": GCS_PROJECT_ID}
     missing_gcs = [name for name, value in required_gcs.items() if not value]
