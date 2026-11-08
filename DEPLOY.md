@@ -72,7 +72,7 @@ As imagens atuais ficam em `eventos-ddc/midias/imagens-iniciais/`; uploads locai
 
 ## Cloud Run
 
-O padrão é serviço `eventos-ddc`, região `southamerica-east1`, mínimo zero e máximo uma instância:
+O padrão é serviço `eventos-ddc`, região `southamerica-east1`, mínimo zero, máximo uma instância e concorrência um:
 
 ```bash
 chmod +x deploy-cloud-run.sh
@@ -90,6 +90,10 @@ Depois do deploy:
 ```bash
 gcloud run services describe eventos-ddc --region southamerica-east1
 ```
+
+## Deploy automático da main
+
+O arquivo `cloudbuild.yaml` constrói a imagem no Artifact Registry e atualiza o serviço mantendo `min=0`, `max=1` e `concurrency=1`. O gatilho Cloud Build `eventos-ddc-main` observa somente pushes no branch `main` do repositório `Pythonic2/eventos-ddc`.
 
 ## IAM do bucket privado
 
