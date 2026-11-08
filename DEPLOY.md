@@ -1,6 +1,6 @@
 # Deploy do eventos-ddc
 
-O projeto usa o PostgreSQL/Neon e o schema definidos no `.env`, mantendo as tabelas isoladas pelo `DB_SCHEMA`. O frontend continua com os assets versionados na imagem e uploads do Admin usam o bucket privado sob:
+O projeto usa o PostgreSQL/Neon e o schema definidos no `.env`, mantendo as tabelas isoladas exclusivamente pelo `DB_SCHEMA` (sem fallback para `public`). O frontend continua com os assets versionados na imagem e uploads do Admin usam o bucket privado sob:
 
 ```text
 gs://gesttechmidias/eventos-ddc/midias/

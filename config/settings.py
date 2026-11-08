@@ -69,7 +69,7 @@ if USE_POSTGRESQL:
     db_options = {
         "connect_timeout": int(os.environ.get("DB_CONNECT_TIMEOUT", "10")),
         "sslmode": os.environ.get("DB_SSLMODE", "require"),
-        "options": f"-c search_path={db_schema},public",
+        "options": f"-c search_path={db_schema}",
     }
     if os.environ.get("DB_CHANNEL_BINDING"):
         db_options["channel_binding"] = os.environ["DB_CHANNEL_BINDING"]
