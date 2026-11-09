@@ -96,7 +96,11 @@ USE_TZ = True
 
 STATIC_URL = os.environ.get("STATIC_URL", "/static/")
 STATIC_ROOT = Path(os.environ.get("STATIC_ROOT", BASE_DIR / "staticfiles"))
-STATICFILES_DIRS = [("site", BASE_DIR / "assets"), ("eventos", BASE_DIR / "eventos" / "assets")]
+STATICFILES_DIRS = [
+    ("site", BASE_DIR / "assets"),
+    ("eventos", BASE_DIR / "eventos" / "assets"),
+    ("brand", BASE_DIR / "static"),
+]
 MEDIA_URL = os.environ.get("MEDIA_URL", "/media/")
 MEDIA_ROOT = Path(os.environ.get("MEDIA_ROOT", BASE_DIR / "media"))
 STORAGES = {
@@ -109,8 +113,8 @@ GCS_BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME", "")
 GCS_PROJECT_ID = os.environ.get("GCS_PROJECT_ID", "")
 GCS_APP_PREFIX = os.environ.get("GCS_APP_PREFIX", "eventos-ddc").strip("/")
 GCS_MEDIA_PREFIX = f"{GCS_APP_PREFIX}/midias"
-GCS_SIGNED_URL_TTL = min(int(os.environ.get("GCS_SIGNED_URL_TTL", "900")), 604800)
-GCS_SIGNED_URL_CACHE_TTL = max(min(GCS_SIGNED_URL_TTL - 60, 840), 1)
+GCS_SIGNED_URL_TTL = min(int(os.environ.get("GCS_SIGNED_URL_TTL", "3600")), 604800)
+GCS_SIGNED_URL_CACHE_TTL = max(min(GCS_SIGNED_URL_TTL - 60, 3540), 1)
 GCS_IAM_SIGN_BLOB = env_bool("GCS_IAM_SIGN_BLOB", True)
 GCS_SA_EMAIL = os.environ.get("GCS_SA_EMAIL", "")
 MEDIA_MAX_UPLOAD_SIZE = int(os.environ.get("MEDIA_MAX_UPLOAD_SIZE", str(100 * 1024 * 1024)))
@@ -124,7 +128,7 @@ if GCS_ENABLED:
         "bucket_name": GCS_BUCKET_NAME, "project_id": GCS_PROJECT_ID, "location": GCS_MEDIA_PREFIX,
         "default_acl": None, "querystring_auth": True, "expiration": GCS_SIGNED_URL_TTL,
         "file_overwrite": False, "iam_sign_blob": GCS_IAM_SIGN_BLOB, "sa_email": GCS_SA_EMAIL or None,
-        "object_parameters": {"cache_control": "private, max-age=900"},
+        "object_parameters": {"cache_control": "private, max-age=3600"},
     }}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

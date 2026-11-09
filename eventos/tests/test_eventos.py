@@ -47,6 +47,14 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         self.assertIn("O que você", content)
         self.assertIn("Fortaleza e Região Metropolitana", content)
 
+    def test_home_uses_shared_logo_and_resets_transition_after_browser_back(self):
+        response = self.client.get(reverse("home"))
+        content = b"".join(response.streaming_content).decode()
+        self.assertIn('/static/brand/logo2.png', content)
+        self.assertIn("window.addEventListener('pageshow',resetarTransicao)", content)
+        self.assertIn("painel.classList.remove('ativa')", content)
+        self.assertIn("const URL_EVENTOS='/eventos/'", content)
+
     def test_prepage_asset_is_available(self):
         response = self.client.get("/assets/fotoboa1.jpg")
         self.assertEqual(response.status_code, 200)
@@ -54,13 +62,18 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
     def test_prepage_uses_events_clean_environment_image(self):
         response = self.client.get(reverse("home"))
         content = b"".join(response.streaming_content).decode()
-        self.assertIn("assets/eventos-ambiente-limpo.png", content)
+        self.assertIn("/static/site/eventos-ambiente-limpo.png", content)
 
     def test_event_page_returns_200_without_configuration(self):
         EventPage.objects.all().delete()
         response = self.client.get(reverse("eventos:index"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "O seu evento merece chopp gelado")
+
+    def test_event_page_uses_shared_logo_as_link_back_to_choices(self):
+        response = self.client.get(reverse("eventos:index"))
+        self.assertContains(response, 'href="/" aria-label="Voltar às escolhas"', count=2)
+        self.assertContains(response, "/static/brand/logo2.png", count=2)
 
     def test_database_content_is_rendered_and_escaped(self):
         page = EventPage.objects.get()
