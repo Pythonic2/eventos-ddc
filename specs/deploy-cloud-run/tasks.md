@@ -9,6 +9,7 @@
 - [x] T07 — Schema/migrations e imagens no GCS
 - [ ] T08 — Cloud Run publicado e verificado
 - [x] T09 — Guia operacional finalizado
+- [ ] T10 — WhatsApp atualizado para `+55 85 98142-3909`, migrado e validado no Raspberry e Cloud Run
 
 ## Evidências
 

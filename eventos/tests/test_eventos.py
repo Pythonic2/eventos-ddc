@@ -139,7 +139,7 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
 
     def test_whatsapp_uses_official_number_and_site_source(self):
         response = self.client.get(reverse("eventos:index"))
-        self.assertContains(response, "5585991803678")
+        self.assertContains(response, "5585981423909")
         self.assertContains(response, "Vim pelo site de eventos da Dona do Chopp")
 
     def test_standard_sections_are_seeded_and_editable(self):
@@ -185,7 +185,7 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
         self.assertContains(response, promotion.titulo)
         self.assertContains(response, "R$ 199,90")
         self.assertContains(response, "Descrição da promoção ativa")
-        self.assertContains(response, f'href="https://wa.me/5585991803678?text=')
+        self.assertContains(response, f'href="https://wa.me/5585981423909?text=')
         self.assertContains(response, 'target="_blank"')
 
     def test_multiple_promotions_render_with_text_photo_and_video(self):
@@ -374,7 +374,7 @@ class ModelValidationTests(TemporaryMediaMixin, TestCase):
         message = parse_qs(parsed.query)["text"][0]
 
         self.assertEqual(parsed.netloc, "wa.me")
-        self.assertEqual(parsed.path, "/5585991803678")
+        self.assertEqual(parsed.path, "/5585981423909")
         self.assertIn("*Promoção:* Chopp & festa", message)
         self.assertIn("*Valor:* R$ 120", message)
         self.assertIn("*Detalhes:* Condição especial para o evento.", message)

@@ -47,7 +47,7 @@ A página de eventos é HTML estático. A equipe administrativa precisa atualiza
 
 ## Perguntas / premissas
 - SQLite e filesystem local são usados somente em desenvolvimento; storage de produção permanece decisão futura.
-- O número oficial de WhatsApp informado para os contatos do site é `+55 85 99180-3678`.
+- O número oficial de WhatsApp informado para os contatos do site é `+55 85 98142-3909`.
 
 ## Rastreabilidade
 | Critério | Teste/comprovação | Status |

@@ -35,6 +35,7 @@ Publicar o site Django de eventos em um repositório GitHub próprio e no Google
 - AC-05: serviço Cloud Run público fica ativo com min 0, max 1 e revisão saudável.
 - AC-06: repositório GitHub `eventos-ddc` contém somente arquivos permitidos e o branch principal é enviado.
 - AC-07: `DEPLOY.md` e scripts permitem repetir migração, upload e deploy sem redigitar comandos extensos.
+- AC-08: todos os CTAs ativos do WhatsApp direcionam para `+55 85 98142-3909`, inclusive o CTA persistido no banco.
 
 ## Segurança e recuperação
 - Segredos serão lidos localmente e passados por arquivo temporário com permissão restrita, removido por `trap`.

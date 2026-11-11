@@ -8,3 +8,4 @@
 6. Fazer revisão de segurança e prontidão GO/NO-GO.
 7. Em GO, inicializar o Git isolado, criar/enviar `eventos-ddc`, aplicar migration, configurar IAM, enviar mídias e publicar Cloud Run.
 8. Verificar URL, configuração de escala, storage e registrar evidências em `DEPLOY.md`.
+9. Atualizar o número oficial do WhatsApp no código e no CTA persistido, validar os links e publicar a revisão nos dois ambientes.
