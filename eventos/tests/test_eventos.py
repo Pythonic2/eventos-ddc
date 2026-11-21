@@ -140,6 +140,7 @@ class EventPageViewTests(TemporaryMediaMixin, TestCase):
     def test_whatsapp_uses_official_number_and_site_source(self):
         response = self.client.get(reverse("eventos:index"))
         self.assertContains(response, "5585981423909")
+        self.assertNotContains(response, "5585991803678")
         self.assertContains(response, "Vim pelo site de eventos da Dona do Chopp")
 
     def test_standard_sections_are_seeded_and_editable(self):

@@ -26,7 +26,7 @@ NEW_SECTIONS = {
         "titulo": "Quer chopp no seu evento?",
         "descricao": "Chame a Dona do Chopp no WhatsApp para consultar marcas, disponibilidade e orçamento.",
         "cta_text": "Falar pelo WhatsApp",
-        "cta_url": "https://wa.me/5585991803678?text=Ol%C3%A1%21%20Vim%20pelo%20site%20de%20eventos%20da%20Dona%20do%20Chopp.",
+        "cta_url": "https://wa.me/5585981423909?text=Ol%C3%A1%21%20Vim%20pelo%20site%20de%20eventos%20da%20Dona%20do%20Chopp.",
         "ordem": 6,
     },
 }
